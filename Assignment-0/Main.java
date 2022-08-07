@@ -14,7 +14,7 @@ public class Main {
         // int width = 30;                            // width
         double[] p_arr = {0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8};
         int[] width_arr = {3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33};
-        
+
         File file = new File("output.txt");
         PrintStream stream = new PrintStream(file);
         PrintStream console = System.out;
@@ -39,7 +39,7 @@ public class Main {
 
                         // print block for verification
                         System.out.println("_______________________________________________");
-                        System.out.println("curr depth: "+ me_cell.depth_curr + "  time(before move):"+time);
+                        System.out.println("curr depth: "+ me_cell.depth_curr + "  time(before move): "+time);
                         System.out.println("  curr sensor: " + cell_wCurr.is_on);
                         if(me_cell.depth_curr != width){
                         System.out.println("a: " + cell_a.is_on + ", s: " + cell_s.is_on + ", d: " + cell_d.is_on);
