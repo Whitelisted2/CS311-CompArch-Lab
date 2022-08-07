@@ -1,5 +1,5 @@
 package parts;
-
+ 
 public class Border {
     // dummy class (?????)
     public static int width;
