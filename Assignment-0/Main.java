@@ -47,5 +47,9 @@ public class Main {
         System.out.println("Total time taken, t = " + time);
         System.out.println("Width of this case, w = "+ width);
         System.out.println("Probability of a sensor being ON, p = "+ p);
+
+        // p,w,t : output format
+        
+
    } 
 }
