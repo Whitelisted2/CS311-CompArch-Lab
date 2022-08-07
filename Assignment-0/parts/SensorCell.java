@@ -12,5 +12,5 @@ public class SensorCell {
         } else{
             this.is_on = false;
         }
-    } 
+    }
 }
