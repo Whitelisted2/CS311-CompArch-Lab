@@ -11,11 +11,11 @@ with open('output.txt') as result:
 	while i < len(file) - 3:
 		prob.append(float(file[i]))
 		width.append(int(file[i+1]))
-		time.append((float(file[i+2]+file[i+5]+file[i+8]+file[i+11]+file[i+14])/5))
+		time.append((float(int(file[i+2])+int(file[i+5])+int(file[i+8])+int(file[i+11])+int(file[i+14]))/5))
 		i += 15
 
 fig = plt.figure()
 graph = fig.add_subplot(111, projection='3d', xlabel='Probability', ylabel='Width', zlabel='Time (s)')
 graph.plot(xs=prob, ys=width, zs=time)
-
+graph.ticklabel_format(useOffset=False, style='plain')
 plt.savefig('graph.png')
