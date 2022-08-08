@@ -26,8 +26,9 @@ public class Main {
                 for(int tnum = 0; tnum<num_trials; tnum++) {
 
                     // System.setOut();
-                    int time = 0;                             // driving loop will begin soon!
+                    Clock clk = new Clock();                  // driving loop will begin soon!
                     Infiltrator me_cell = new Infiltrator();
+                    Border newBorder = new Border(width);
 
                     while(me_cell.is_win == false && me_cell.is_caught == false) {
 
@@ -39,23 +40,23 @@ public class Main {
 
                         // print block for verification
                         System.out.println("_______________________________________________");
-                        System.out.println("curr depth: "+ me_cell.depth_curr + "  time(before move): "+time);
+                        System.out.println("curr depth: "+ me_cell.depth_curr + "  time(before move): "+clk.the_time);
                         System.out.println("  curr sensor: " + cell_wCurr.is_on);
-                        if(me_cell.depth_curr != width){
+                        if(me_cell.depth_curr != newBorder.width){
                         System.out.println("a: " + cell_a.is_on + ", s: " + cell_s.is_on + ", d: " + cell_d.is_on);
                         }
                         
                         // border case where infil. is at the lowermost row of sensors
-                        if(me_cell.depth_curr == width){
+                        if(me_cell.depth_curr == newBorder.width){
                             if(!cell_wCurr.is_on){
                                 me_cell.depth_curr++; // this line not required actually ... 
-                                time+=10;
+                                clk.addTime(10);
                                 
                                 System.out.println("\n!!! reached other side !!!");
                                 me_cell.is_win = true;
                                 break;
                             }else{
-                                time+=10;
+                                clk.addTime(10);
                                 continue;
                             }
                         }
@@ -64,16 +65,16 @@ public class Main {
                         if(((!cell_a.is_on) || (!cell_s.is_on) || (!cell_d.is_on)) && !cell_wCurr.is_on){
                             me_cell.depth_curr++;
                         }
-                        time+=10;
+                        clk.addTime(10);
                     }
                     System.out.println("_______________________________________________");
                     System.out.println("Probability of a sensor being ON, p = "+ p);
-                    System.out.println("Width of this case, w = "+ width);
-                    System.out.println("Total time taken, t = " + time);
+                    System.out.println("Width of this case, w = "+ newBorder.width);
+                    System.out.println("Total time taken, t = " + clk.the_time);
 
                     // p,w,t : output format
                     System.setOut(stream);
-                    System.out.println(p + "," + width + "," + time);
+                    System.out.println(p + "," + newBorder.width + "," + clk.the_time);
                     System.setOut(console);
                 }
             }
