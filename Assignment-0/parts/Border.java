@@ -1,11 +1,9 @@
 package parts;
  
 public class Border {
-    // border consists of length (infinite) and width.
-    public int width, length;
-    public Border(int d){
+    // dummy class (?????) not sure if need to make Clock class either
+    public static int width;
+    public Border(int d, int L){
         width = d;
-        length = Integer.MAX_VALUE;
-        // no actual need to set L ... we'll never use it; this program accounts for infinite L anyway.
-    }
+    } 
 }
