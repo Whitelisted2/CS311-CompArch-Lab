@@ -13,7 +13,7 @@ public class Main {
         // double p = 0.5;                            // p 
         // int width = 30;                            // width
         double[] p_arr = {0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8};
-        int[] width_arr = {3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33};
+        int[] width_arr = {3, 6, 9, 12, 15, 18, 21, 24, 27, 30};
 
         File file = new File("output.txt");
         PrintStream stream = new PrintStream(file);
