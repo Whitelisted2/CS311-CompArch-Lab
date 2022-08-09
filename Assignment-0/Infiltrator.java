@@ -1,5 +1,3 @@
-package parts;
-
 public class Infiltrator {
     public int depth_curr;
     public boolean is_win, is_caught;

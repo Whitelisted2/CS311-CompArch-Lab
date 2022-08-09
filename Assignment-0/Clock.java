@@ -1,4 +1,4 @@
-package parts;
+
 
 public class Clock {
    public int the_time;

@@ -1,4 +1,4 @@
-package parts;
+
  
 public class Border {
     // border consists of length (infinite) and width.

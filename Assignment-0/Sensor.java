@@ -1,4 +1,4 @@
-package parts;
+
 import java.util.Random;
 
 public class Sensor {

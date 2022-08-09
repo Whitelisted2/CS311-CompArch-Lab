@@ -2,7 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
-import parts.*;
+//import parts.*;
 
 public class Main {
    public static void main(String[] args) throws FileNotFoundException {
