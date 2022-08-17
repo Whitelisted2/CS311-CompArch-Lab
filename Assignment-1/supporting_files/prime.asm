@@ -1,10 +1,11 @@
 	.data
 a:
-	100
+	10
 	.text
 main:
 	load %x0, $a, %x3
 	addi %x0, 2, %x4
+	blt %x3, 2, noprime
 	beq %x3, %x4, yesprime
 loop:
 	div %x3, %x4, %x5
