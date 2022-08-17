@@ -1,18 +1,20 @@
 	.data
 n:
-	15
+	2
 	.text
 main:
 	load %x0, $n, %x3
 	addi %x0, 0, %x4
 	addi %x0, 1, %x5
 	addi %x0, 65535, %x8
-	bgt %x3, 0, setfirst
+	bgt %x3, %x5, setfirst
+	blt %x3, 2, getout
 	end
 setfirst:
 	store %x4, 0, %x8
 	subi %x8, 1, %x8
-	bgt %x3, 1, nextpart
+	bgt %x3, 2, nextpart
+	end
 nextpart:
 	store %x5, 0, %x8
 	subi %x8, 1, %x8
