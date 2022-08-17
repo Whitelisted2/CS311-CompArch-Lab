@@ -11,6 +11,5 @@ a:
 n:
 	8
 	.text
-// your code here
-// you may change the numbers in the array, and the size of the array; but allow the name of the array to remain as 'a', and size as 'n'
-// remove these comments!
+main:
+	
