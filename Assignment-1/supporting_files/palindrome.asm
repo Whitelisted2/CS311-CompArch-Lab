@@ -1,10 +1,11 @@
 	.data
 a:
-	11
+	102
 	.text
 main:
 	load %x0, $a, %x3
 	addi %x0, 0, %x4
+	blt %x3, %x0, out
 	add %x0, %x3, %x5
 loop:
 	divi %x5, 10, %x5
