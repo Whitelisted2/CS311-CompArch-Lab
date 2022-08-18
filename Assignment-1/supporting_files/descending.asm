@@ -17,7 +17,7 @@ main:
 	subi %x3, 1, %x3	;x3 = n - 1
 elderloop:
 	beq %x4, %x3, enditall	;check if i = n - 1, condition for termination
-	subi %x3, $x4, %x9	; n-i-1, stored in x9
+	subi %x3, %x4, %x9	; n-i-1, stored in x9
 	addi %x4, 1, %x4	;incrementing i
 	addi %x0, %x0, %x5	;initialize j = 0
 youngloop:
