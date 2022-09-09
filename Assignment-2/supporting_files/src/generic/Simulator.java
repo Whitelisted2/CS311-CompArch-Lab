@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class Simulator {
 
-	public static Map<String,String> opTable = new HashMap<>(){{
+	public static HashMap<String,String> opTable = new HashMap<String, String>(){{
 		put("add", "00000");
 		put("sub", "00010");
 		put("mul", "00100");
@@ -72,13 +72,14 @@ public class Simulator {
 
 			//4. assemble one instruction at a time, and write to the file
 			for(int i=0; i<ParsedProgram.code.size(); i++){
-				String bisaun = "";
+				String bisaun = ""; // line to append to file
 				String opType = ParsedProgram.code.get(i).toString();
 				if(opType.equals("jmp")){
-					bisaun += (opTable.get(ParsedProgram.code.get(i).operationType.toString()));
-					bisaun += "00000";
+					// RI type
+					bisaun += (opTable.get("jmp")); // opcode of jmp
+					bisaun += "00000"; // no register in jmp 
 					int destAddr = 0;
-					if(ParsedProgram.code.get(i).destinationOperand.toString().equals("Label")){
+					if(ParsedProgram.code.get(i).destinationOperand.toString().equals("Label")){ 
 						destAddr = ParsedProgram.symtab.get(ParsedProgram.code.get(i).destinationOperand.labelValue);
 					}
 					else if(ParsedProgram.code.get(i).destinationOperand.toString().equals("Immediate")){
@@ -97,19 +98,48 @@ public class Simulator {
 						}
 						bisaun.concat(concata);
 						bisaun.concat(binRep);
-					}
-					if(offset<0)
-					{
+					} else {
 						String binRep = Integer.toBinaryString(offset);
 						String subRep = binRep.substring(10, 32);
 						bisaun.concat(subRep);
 					}
 				}
 				else if(opType.equals("load")||opType.equals("store")){
+					bisaun += (opTable.get(opType));
+					if(ParsedProgram.code.get(i).sourceOperand1.operandType.toString().equals("Register")){
+						bisaun.concat(Integer.toBinaryString(ParsedProgram.code.get(i).sourceOperand1.value));
+					}
+					if(ParsedProgram.code.get(i).destinationOperand.operandType.toString().equals("Register")){
+						bisaun.concat(Integer.toBinaryString(ParsedProgram.code.get(i).destinationOperand.value));
+					}
+					if(ParsedProgram.code.get(i).sourceOperand2.operandType.toString().equals("Label")){
+						String labeVal = Integer.toBinaryString(ParsedProgram.symtab.get(ParsedProgram.code.get(i).sourceOperand2.labelValue));
+						int labeSize = labeVal.length();
+						String labeConcat = "";
+						if(labeSize != 17){
+							int toBe = 17 - labeSize;
+							for(int j=0; j<toBe; j++)
+								labeConcat += "0";
+							labeConcat.concat(labeVal);
+						}
+						bisaun.concat(labeConcat);
+					}
+					if(ParsedProgram.code.get(i).sourceOperand2.operandType.toString().equals("Immediate")){
+						String labeVal = Integer.toBinaryString(ParsedProgram.code.get(i).sourceOperand2.value);
+						int labeSize = labeVal.length();
+						String labeConcat = "";
+						if(labeSize != 17){
+							int toBe = 17 - labeSize;
+							for(int j=0; j<toBe; j++)
+								labeConcat += "0";
+							labeConcat.concat(labeVal);
+						}
+						bisaun.concat(labeConcat);	
+					}
 
 				}
 				else if(opType.equals("add") || opType.equals("sub") || opType.equals("mul") || opType.equals("div") || opType.equals("and") || opType.equals("or") || opType.equals("xor") || opType.equals("slt") || opType.equals("sll") || opType.equals("srl") || opType.equals("sra")){
-
+					
 				}
 				else if(opType.equals("addi") || opType.equals("subi") || opType.equals("muli") || opType.equals("divi") || opType.equals("andi") || opType.equals("ori") || opType.equals("xori") || opType.equals("slti") || opType.equals("slli") || opType.equals("srli") || opType.equals("srai")){
 
@@ -118,30 +148,30 @@ public class Simulator {
 
 				}
 				else if(opType.equals("end")){
-					
+					bisaun = bisaun.concat("11101000000000000000000000000000");
 				}
+				byte[] toThefile = ByteBuffer.allocate(4).putInt((int)Long.parseLong(bisaun)).array();
+				mech.write(toThefile);
 			}
-			
-
-
-
+			//5. close the file
+			mech.close();
 
 		} catch(FileNotFoundException e){
 			e.printStackTrace();
+
 		} catch(IOException e){
 			e.printStackTrace();
-		}
 
-		//5. close the file
+		}
 	}
 	
 
 
 
-	public static Map<String, String> getOpTable() {
+	public static HashMap<String, String> getOpTable() {
 		return opTable;
 	}
 
-	public static void setOpTable(Map<String, String> opTable) {
+	public static void setOpTable(HashMap<String, String> opTable) {
 		Simulator.opTable = opTable;
 	}}
