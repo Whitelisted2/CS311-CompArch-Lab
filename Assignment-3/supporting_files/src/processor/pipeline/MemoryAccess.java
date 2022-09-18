@@ -1,5 +1,6 @@
 package processor.pipeline;
 
+import generic.Instruction;
 import processor.Processor;
 
 public class MemoryAccess {
@@ -16,7 +17,22 @@ public class MemoryAccess {
 	
 	public void performMA()
 	{
-		//TODO
+		if(EX_MA_Latch.isMA_enable()){
+			Instruction instruction = EX_MA_Latch.getInstruction();
+			String op = instruction.getOperationType().toString();
+			int aluResult = EX_MA_Latch.getaluResult();
+			MA_RW_Latch.setaluResult(aluResult);
+
+			if(op.equals("load")){
+				// generate ldResult
+			}else if(op.equals("store")){
+				// do storing yay
+			}
+
+			MA_RW_Latch.setInstruction(instruction);
+			EX_MA_Latch.setMA_enable(false);
+			MA_RW_Latch.setRW_enable(true);
+		}
 	}
 
 }
