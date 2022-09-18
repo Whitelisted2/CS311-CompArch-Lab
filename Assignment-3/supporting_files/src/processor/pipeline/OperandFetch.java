@@ -19,6 +19,12 @@ public class OperandFetch {
 		if(IF_OF_Latch.isOF_enable())
 		{
 			//TODO
+			String newInstruction = Integer.toBinaryString(IF_OF_Latch.getInstruction());
+			int cSize = newInstruction.length();
+			cSize = 32 - cSize;
+			for(int i=1;i<=cSize;i++)
+				newInstruction = '0' + newInstruction;
+			String opCode = newInstruction.substring(0, 5);
 			
 			IF_OF_Latch.setOF_enable(false);
 			OF_EX_Latch.setEX_enable(true);

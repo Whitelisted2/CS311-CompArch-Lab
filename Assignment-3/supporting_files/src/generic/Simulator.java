@@ -1,5 +1,10 @@
 package generic;
 
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import processor.Clock;
 import processor.Processor;
 
@@ -28,10 +33,34 @@ public class Simulator {
 		 *     x1 = 65535
 		 *     x2 = 65535
 		 */
+		InputStream tumajar=null;
+		try{
+			tumajar= new FileInputStream(assemblyProgramFile);
+			DataInputStream bisaun = new DataInputStream(tumajar);
+			int next=0;
+			if(bisaun.available()>0){
+				next = bisaun.readInt();
+				processor.getRegisterFile().setProgramCounter(next);
+			} 
+			for(int address=0;bisaun.available()>0;address++){
+				next=bisaun.readInt();
+				processor.getMainMemory().setWord(address, next);
+			}
+			processor.getRegisterFile().setValue(0, 0);
+			processor.getRegisterFile().setValue(1,65535);
+			processor.getRegisterFile().setValue(2, 65535);
+			bisaun.close();
+		}
+		catch(IOException e){
+			e.printStackTrace();
+		}
+
 	}
 	
 	public static void simulate()
 	{
+		int numinst = 0;
+		int numcycles = 0;
 		while(simulationComplete == false)
 		{
 			processor.getIFUnit().performIF();
@@ -44,10 +73,14 @@ public class Simulator {
 			Clock.incrementClock();
 			processor.getRWUnit().performRW();
 			Clock.incrementClock();
+			++numinst;
+			++numcycles;
 		}
 		
 		// TODO
 		// set statistics
+		Statistics.setNumberOfInstructions(numinst);
+		Statistics.setNumberOfCycles(numcycles);
 	}
 	
 	public static void setSimulationComplete(boolean value)
