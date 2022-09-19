@@ -24,9 +24,14 @@ public class MemoryAccess {
 			MA_RW_Latch.setaluResult(aluResult);
 
 			if(op.equals("load")){
-				// generate ldResult
+				int ldResult = containingProcessor.getMainMemory().getWord(aluResult);
+				MA_RW_Latch.setldResult(ldResult);
 			}else if(op.equals("store")){
-				// do storing yay
+				// aluResult is location of storing
+				// rs1 contains data to be stored
+				int rs1 = instruction.getSourceOperand1().getValue();
+				int inp = containingProcessor.getRegisterFile().getValue(rs1);
+				containingProcessor.getMainMemory().setWord(aluResult, inp);
 			}
 
 			MA_RW_Latch.setInstruction(instruction);
