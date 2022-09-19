@@ -24,7 +24,7 @@ public class Simulator {
 	static void loadProgram(String assemblyProgramFile)
 	{
 		/*
-		 * TODO
+		 * TOD0
 		 * 1. load the program into memory according to the program layout described
 		 *    in the ISA specification
 		 * 2. set PC to the address of the first instruction in the main
@@ -77,10 +77,12 @@ public class Simulator {
 			++numcycles;
 		}
 		
-		// TODO
+		// TOD0
 		// set statistics
 		Statistics.setNumberOfInstructions(numinst);
 		Statistics.setNumberOfCycles(numcycles);
+		Statistics.setCPI(numinst, numcycles);
+		Statistics.setIPC(numinst, numcycles);
 	}
 	
 	public static void setSimulationComplete(boolean value)
