@@ -1,6 +1,5 @@
 package processor.pipeline;
 import generic.Instruction;
-import generic.Instruction.OperationType;
 import generic.Operand.OperandType;
 import processor.Processor;
 
