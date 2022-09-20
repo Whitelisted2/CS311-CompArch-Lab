@@ -28,7 +28,7 @@ public class Execute {
 		if(OF_EX_Latch.isEX_enable()){
 			Instruction instruction = OF_EX_Latch.getInstruction();
 			EX_MA_Latch.setInstruction(instruction);
-			OperationType opType = instruction.getOperationType();
+			String opType = instruction.getOperationType().toString();
 			int nowPc = containingProcessor.getRegisterFile().programCounter -1;
 			int aluResult = 0;
 			b = opType.equals("addi") || opType.equals("subi") || opType.equals("muli") || opType.equals("divi") || opType.equals("andi") || opType.equals("ori") || opType.equals("xori") || opType.equals("slti") || opType.equals("slli") || opType.equals("srli") || opType.equals("srai") || opType.equals("load") || opType.equals("store");
@@ -36,91 +36,90 @@ public class Execute {
 				int rs1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
 				int immed = instruction.getDestinationOperand().getValue();
 				switch(opType){
-					case addi:
+					case "addi":
 						aluResult = rs1 + immed;
 						break;
-					case subi:
+					case "subi":
 						aluResult = rs1 - immed;
 						break;
-					case muli:
+					case "muli":
 						aluResult = rs1*immed;
 						break;
-					case divi:
+					case "divi":
 						aluResult = rs1/immed;
 						break;
-					case andi:
+					case "andi":
 						aluResult = rs1&immed;
 						break;
-					case ori:
+					case "ori":
 						aluResult = rs1 | immed;
 						break;
-					case xori:
+					case "xori":
 						aluResult = rs1 ^ immed;
 						break;
-					case slti:
+					case "slti":
 						aluResult = 0;
 						if(immed > rs1) aluResult = 1;
 						break;
-					case slli: 
+					case "slli": 
 						aluResult = rs1 << immed;
 						break;
-					case srli: 
+					case "srli": 
 						aluResult = rs1 >>> immed;
 						break;
-					case srai: 
+					case "srai": 
 						aluResult = rs1 >> immed;
 						break;
-					case load:
+					case "load":
 						aluResult = rs1 + immed;
 						break;
-					case store:
+					case "store":
 						aluResult = rs1 + immed;
 						break;
 					default: 
 						System.out.print("Issue detected in Execute.java, switch(OpType) for R2I");
-				}
+				}}
 			else if(opType.equals("add") || opType.equals("sub") || opType.equals("mul") || opType.equals("div") || opType.equals("and") || opType.equals("or") || opType.equals("xor") || opType.equals("slt") || opType.equals("sll") || opType.equals("srl") || opType.equals("sra")){
 				int rs1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
 				int rs2 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand2().getValue());
-				int rd = containingProcessor.getRegisterFile().getValue(instruction.getDestinationOperand().getValue());
 				switch(opType){
-					case add:
+					case "add":
 						aluResult = rs1 + rs2;
 						break;
-					case sub:
+					case "sub":
 						aluResult = rs1 - rs2;
 						break;
-					case mul:
+					case "mul":
 						aluResult = rs1 * rs2;
 						break;
-					case div:
+					case "div":
 						aluResult = rs1 / rs2;
 						break;
-					case and: 
+					case "and": 
 						aluResult = rs1 & rs2;
 						break;
-					case or:
+					case "or":
 						aluResult = rs1 | rs2;
 						break;
-					case xor:
+					case "xor":
 						aluResult = rs1 ^ rs2;
 						break;
-					case slt:
+					case "slt":
 						aluResult = 0;
 						if(rs2 > rs1) aluResult = 1;
 						break;
-					case sll:
+					case "sll":
 						aluResult = rs1 << rs2;
 						break;
-					case srl:
+					case "srl":
 						aluResult = rs1 >>> rs2;
 						break;
-					case sra:
+					case "sra":
 						aluResult = rs1 >> rs2;
 						break;
 					default:
 						System.out.print("Issue detected in R3 type switch");
-				}
+				}}
 			else if(opType.equals("jmp")){
 				OperandType jmpType = instruction.getDestinationOperand().getOperandType();
 				int immed = 0;
@@ -130,10 +129,51 @@ public class Execute {
 				aluResult = immed + nowPc;
 				EX_IF_Latch.setIsBranch_enable(true,aluResult);
 			}
+			else if(opType.equals("end")){
+				/*
+				 * do something
+				 */
 			}
+			else{
+				int rs1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
+				int rd = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand2().getValue());
+				int immed = instruction.getDestinationOperand().getValue();
+				switch(opType){
+					case "beq":
+						if(rs1==rd){
+							aluResult = nowPc + immed;
+							EX_IF_Latch.setIsBranch_enable(true,aluResult);
+						}
+						break;
+					case "bgt":
+						if(rs1>rd){
+							aluResult = nowPc + immed;
+							EX_IF_Latch.setIsBranch_enable(true,aluResult);
+						}
+						break;
+					case "bne":
+						if(rs1!=rd){
+							aluResult = nowPc + immed;
+							EX_IF_Latch.setIsBranch_enable(true,aluResult);
+						}
+						break;
+					case "blt":
+						if(rs1<rd){
+							aluResult = nowPc + immed;
+							EX_IF_Latch.setIsBranch_enable(true,aluResult);
+						}
+						break;
+					default:
+						System.out.print("Issue detected in R2I type, for branch statements");
+				}
 			}
+
 		}
+		OF_EX_Latch.setEX_enable(false);
+		EX_MA_Latch.setMA_enable(true);
+		}
+
 
 	}
 
-}
+
