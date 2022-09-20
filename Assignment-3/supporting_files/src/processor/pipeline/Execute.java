@@ -21,6 +21,7 @@ public class Execute {
 
 	public void performEX()
 	{
+		boolean jmpRes = false;
 		/* blabla
 		 * 
 		 */
@@ -29,11 +30,12 @@ public class Execute {
 			EX_MA_Latch.setInstruction(instruction);
 			String opType = instruction.getOperationType().toString();
 			int nowPc = containingProcessor.getRegisterFile().programCounter -1;
+			
 			int aluResult = 0;
 			b = opType.equals("addi") || opType.equals("subi") || opType.equals("muli") || opType.equals("divi") || opType.equals("andi") || opType.equals("ori") || opType.equals("xori") || opType.equals("slti") || opType.equals("slli") || opType.equals("srli") || opType.equals("srai") || opType.equals("load") || opType.equals("store");
 			if(b){
 				int rs1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
-				int immed = instruction.getDestinationOperand().getValue();
+				int immed = instruction.getSourceOperand2().getValue();
 				switch(opType){
 					case "addi":
 						aluResult = rs1 + immed;
@@ -46,6 +48,8 @@ public class Execute {
 						break;
 					case "divi":
 						aluResult = rs1/immed;
+						containingProcessor.getRegisterFile().setValue(31, rs1%immed);
+						// System.out.println(aluResult);
 						break;
 					case "andi":
 						aluResult = rs1&immed;
@@ -93,6 +97,7 @@ public class Execute {
 						break;
 					case "div":
 						aluResult = rs1 / rs2;
+						containingProcessor.getRegisterFile().setValue(31, rs1%rs2);
 						break;
 					case "and": 
 						aluResult = rs1 & rs2;
@@ -125,7 +130,8 @@ public class Execute {
 				if(jmpType == OperandType.Immediate)
 					immed = instruction.getDestinationOperand().getValue();
 				else immed = containingProcessor.getRegisterFile().getValue(instruction.getDestinationOperand().getValue());
-				aluResult = immed + nowPc;
+				aluResult = immed + nowPc ;
+				jmpRes = true;
 				EX_IF_Latch.setIsBranch_enable(true,aluResult);
 			}
 			else if(opType.equals("end")){
@@ -134,6 +140,9 @@ public class Execute {
 				 */
 			}
 			else{
+				// for palindrome, remove ++nowpc ...
+				// for desc, removing pc++ makes it go mad. with nowpc++, wrong hash
+				++nowPc;
 				int rs1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
 				int rd = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand2().getValue());
 				int immed = instruction.getDestinationOperand().getValue();
@@ -141,24 +150,29 @@ public class Execute {
 					case "beq":
 						if(rs1==rd){
 							aluResult = nowPc + immed;
+							jmpRes = true;
 							EX_IF_Latch.setIsBranch_enable(true,aluResult);
 						}
 						break;
 					case "bgt":
 						if(rs1>rd){
 							aluResult = nowPc + immed;
+							jmpRes = true;
+							System.out.println(aluResult + "bgt and pc is " + nowPc);
 							EX_IF_Latch.setIsBranch_enable(true,aluResult);
 						}
 						break;
 					case "bne":
 						if(rs1!=rd){
 							aluResult = nowPc + immed;
+							jmpRes = true;
 							EX_IF_Latch.setIsBranch_enable(true,aluResult);
 						}
 						break;
 					case "blt":
 						if(rs1<rd){
 							aluResult = nowPc + immed;
+							jmpRes = true;
 							EX_IF_Latch.setIsBranch_enable(true,aluResult);
 						}
 						break;
@@ -166,9 +180,10 @@ public class Execute {
 						System.out.print("Issue detected in R2I type, for branch statements");
 				}
 			}
-
+			EX_MA_Latch.setaluResult(aluResult);
 		}
 		OF_EX_Latch.setEX_enable(false);
+		if(jmpRes == false)
 		EX_MA_Latch.setMA_enable(true);
 		}
 

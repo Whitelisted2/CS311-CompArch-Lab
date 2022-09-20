@@ -23,6 +23,7 @@ public class RegisterWrite {
 		{
 			Instruction instruction = MA_RW_Latch.getInstruction();
 			String op = instruction.getOperationType().toString();
+			// System.out.print(containingProcessor.getRegisterFile().getValue(1));
 			// int aluResult = MA_RW_Latch.getaluResult();
 			if(op.equals("load")){
 				int ldResult = MA_RW_Latch.getldResult();

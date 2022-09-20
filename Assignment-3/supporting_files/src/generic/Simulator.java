@@ -73,6 +73,7 @@ public class Simulator {
 			Clock.incrementClock();
 			processor.getRWUnit().performRW();
 			Clock.incrementClock();
+			// System.out.println(processor.getRegisterFile().getContentsAsString()); 
 			++numinst;
 			++numcycles;
 		}

@@ -117,13 +117,23 @@ public class OperandFetch {
 					rd = new Operand();
 					rd.setValue(Integer.parseInt(immed,2));
 					newInst.setSourceOperand1(rs1);
-					newInst.setSourceOperand2(rs2);
-					newInst.setDestinationOperand(rd);
+					newInst.setSourceOperand2(rd);
+					newInst.setDestinationOperand(rs2);
 					break;
 				case jmp:
 					Operand imme = new Operand();
 					imme.setOperandType(OperandType.Immediate);
-					imme.setValue(Integer.parseInt(newInstruction.substring(10, 32),2));
+					rd = new Operand();
+					rd.setOperandType(OperandType.Register);
+					rd.setValue(Integer.parseInt(newInstruction.substring(5, 10),2));
+					newInst.setSourceOperand1(rd);
+					String immedi = newInstruction.substring(10, 32);
+					imme.setValue(Integer.parseInt(immedi,2));
+					if(immedi.charAt(0)=='1'){
+						immedi = twosComplement(immedi);
+						imme.setValue(-1*Integer.parseInt(immedi,2));
+					}
+					System.out.println("\n" + imme);
 					newInst.setDestinationOperand(imme);
 					break;
 				case beq:
@@ -138,7 +148,12 @@ public class OperandFetch {
 					imme.setOperandType(OperandType.Immediate);
 					rs1.setValue(Integer.parseInt(newInstruction.substring(5, 10),2));
 					rd.setValue(Integer.parseInt(newInstruction.substring(10, 15),2));
-					imme.setValue(Integer.parseInt(newInstruction.substring(15, 32)));
+					immedi = newInstruction.substring(15, 32);
+					imme.setValue(Integer.parseInt(immedi,2));
+					if(immedi.charAt(0)=='1'){
+						immedi = twosComplement(immedi);
+						imme.setValue(-1*Integer.parseInt(immedi,2));
+					}
 					newInst.setSourceOperand1(rs1);
 					newInst.setSourceOperand2(rd);
 					newInst.setDestinationOperand(imme);

@@ -29,6 +29,16 @@ public class InstructionFetch {
 			IF_EnableLatch.setIF_enable(false);
 			IF_OF_Latch.setOF_enable(true);
 		}
+		else if(EX_IF_Latch.getIsBranch_enable()){
+			int newPC = EX_IF_Latch.getPC();
+			// System.out.println("\n"+newPC);
+			int newInst = containingProcessor.getMainMemory().getWord(newPC);
+			IF_OF_Latch.setInstruction(newInst);
+			containingProcessor.getRegisterFile().setProgramCounter(newPC);
+			EX_IF_Latch.setIsBranch_enable(false);
+			IF_OF_Latch.setOF_enable(true);
+
+		}
 	}
 
 }
