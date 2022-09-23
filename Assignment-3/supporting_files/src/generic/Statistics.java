@@ -28,7 +28,7 @@ public class Statistics {
 			Misc.printErrorAndExit(e.getMessage());
 		}
 	}
-	
+	 
 	// TODO write functions to update statistics
 	public static void setNumberOfInstructions(int numberOfInstructions) {
 		Statistics.numberOfInstructions = numberOfInstructions;
@@ -51,7 +51,7 @@ public class Statistics {
 	}
 
 	public static void setCPI(int numinst, int numcycles) {
-		iPC = (float)numcycles / (float)numinst;
+		cPI = (float)numcycles / (float)numinst;
 	}
 
 	public static float getIPC() {

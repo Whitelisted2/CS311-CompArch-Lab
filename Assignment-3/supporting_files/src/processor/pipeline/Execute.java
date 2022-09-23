@@ -36,6 +36,7 @@ public class Execute {
 			if(b){
 				int rs1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
 				int immed = instruction.getSourceOperand2().getValue();
+				int rd = containingProcessor.getRegisterFile().getValue(instruction.getDestinationOperand().getValue());
 				switch(opType){
 					case "addi":
 						aluResult = rs1 + immed;
@@ -77,7 +78,9 @@ public class Execute {
 						aluResult = rs1 + immed;
 						break;
 					case "store":
-						aluResult = rs1 + immed;
+						aluResult = rd + immed;
+						// System.out.println("rs 1 :"+ rs1+ "\n"+ "immed :"+immed +"\n"+ "rd : "+ rd);
+						// System.out.println("Trying to store " + rd + " in " +  aluResult);
 						break;
 					default: 
 						System.out.print("Issue detected in Execute.java, switch(OpType) for R2I");
@@ -142,7 +145,7 @@ public class Execute {
 			else{
 				// for palindrome, remove ++nowpc ...
 				// for desc, removing pc++ makes it go mad. with nowpc++, wrong hash
-				++nowPc;
+				// ++nowPc;
 				int rs1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
 				int rd = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand2().getValue());
 				int immed = instruction.getDestinationOperand().getValue();
@@ -158,7 +161,7 @@ public class Execute {
 						if(rs1>rd){
 							aluResult = nowPc + immed;
 							jmpRes = true;
-							System.out.println(aluResult + "bgt and pc is " + nowPc);
+							// System.out.println(aluResult + "bgt and pc is " + nowPc);
 							EX_IF_Latch.setIsBranch_enable(true,aluResult);
 						}
 						break;
@@ -178,13 +181,15 @@ public class Execute {
 						break;
 					default:
 						System.out.print("Issue detected in R2I type, for branch statements");
+						break;
 				}
 			}
+			// System.out.println("At " + containingProcessor.getRegisterFile().getProgramCounter()+ " with " + aluResult + " and optype " + opType);
 			EX_MA_Latch.setaluResult(aluResult);
 		}
 		OF_EX_Latch.setEX_enable(false);
 		if(jmpRes == false)
-		EX_MA_Latch.setMA_enable(true);
+		{EX_MA_Latch.setMA_enable(true);}
 		}
 
 

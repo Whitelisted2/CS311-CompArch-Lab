@@ -111,11 +111,13 @@ public class OperandFetch {
 					rs1.setValue(Integer.parseInt(newInstruction.substring(5, 10),2));
 					rs2.setValue(Integer.parseInt(newInstruction.substring(10, 15),2));
 					immed = newInstruction.substring(15, 32);
+					rd = new Operand();
+					rd.setOperandType(OperandType.Immediate);
 					if(immed.charAt(0)=='1'){
 						immed = twosComplement(immed);
+						rd.setValue(-1*Integer.parseInt(immed,2));
 					}
-					rd = new Operand();
-					rd.setValue(Integer.parseInt(immed,2));
+					else rd.setValue(Integer.parseInt(immed,2));
 					newInst.setSourceOperand1(rs1);
 					newInst.setSourceOperand2(rd);
 					newInst.setDestinationOperand(rs2);
@@ -133,7 +135,7 @@ public class OperandFetch {
 						immedi = twosComplement(immedi);
 						imme.setValue(-1*Integer.parseInt(immedi,2));
 					}
-					System.out.println("\n" + imme);
+					// System.out.println("\n" + imme);
 					newInst.setDestinationOperand(imme);
 					break;
 				case beq:
