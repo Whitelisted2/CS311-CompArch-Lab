@@ -10,11 +10,17 @@ public class OperandFetch {
 	Processor containingProcessor;
 	IF_OF_LatchType IF_OF_Latch;
 	OF_EX_LatchType OF_EX_Latch;
+	EX_MA_LatchType EX_MA_Latch;
+	MA_RW_LatchType MA_RW_Latch;
+	IF_EnableLatchType IF_LatchE;
 
-	public OperandFetch(Processor containingProcessor, IF_OF_LatchType iF_OF_Latch, OF_EX_LatchType oF_EX_Latch) {
+	public OperandFetch(Processor containingProcessor, IF_OF_LatchType iF_OF_Latch, OF_EX_LatchType oF_EX_Latch, EX_MA_LatchType eX_MA_Latch, MA_RW_LatchType mA_RW_Latch, IF_EnableLatchType iF_EnableE) {
 		this.containingProcessor = containingProcessor;
 		this.IF_OF_Latch = iF_OF_Latch;
 		this.OF_EX_Latch = oF_EX_Latch;
+		this.EX_MA_Latch = eX_MA_Latch;
+		this.MA_RW_Latch = mA_RW_Latch;
+		this.IF_LatchE = iF_EnableE;
 	}
 
 	public String twosComplement(String bin) {
@@ -49,6 +55,25 @@ public class OperandFetch {
 		return (c == '0') ? '1' : '0';
 	}
 
+	public boolean misterConflict(Instruction instC, int regA, int regB){
+		if(instC != null){
+			int dest_op = instC.getDestinationOperand().getValue();
+			if(dest_op == regA || dest_op == regB){
+				System.out.println("Data Conflict!");
+				return true;
+			}
+			if(instC.getOperationType().ordinal() == 6 || instC.getOperationType().ordinal() == 7){
+				if(regA == 31 || regB == 31){
+					System.out.println("Data, Division conflict!");
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean mrsDivConflict(Instruction instC, int regA, int a){return false;}
+
 	public void performOF()
 	{
 		if(IF_OF_Latch.isOF_enable())
@@ -64,6 +89,10 @@ public class OperandFetch {
 			OperationType[] opConv = OperationType.values();
 			OperationType opInst = opConv[Integer.parseInt(opCode,2)];
 			newInst.setOperationType(opInst);
+			Instruction inst_ex = OF_EX_Latch.getInstruction();
+			Instruction inst_ma = EX_MA_Latch.getInstruction();
+			Instruction inst_rw = MA_RW_Latch.getInstruction();
+			boolean conflict_check = false;
 			switch(opInst){
 
 				case add:
@@ -85,7 +114,12 @@ public class OperandFetch {
 					rd.setOperandType(OperandType.Register);
 					rs1.setValue(Integer.parseInt(newInstruction.substring(5,10),2));
 					rs2.setValue(Integer.parseInt(newInstruction.substring(10, 15),2));
+					int num1 = rs1.getValue();
+					int num2 = rs2.getValue();
 					rd.setValue(Integer.parseInt(newInstruction.substring(15, 20),2));
+					if(misterConflict(inst_ex,num1,num2)||misterConflict(inst_ma, num1, num2)||misterConflict(inst_rw, num1, num2)){
+						conflict_check = true;
+					}
 					newInst.setSourceOperand1(rs1);
 					newInst.setSourceOperand2(rs2);
 					newInst.setDestinationOperand(rd);
@@ -118,6 +152,10 @@ public class OperandFetch {
 						rd.setValue(-1*Integer.parseInt(immed,2));
 					}
 					else rd.setValue(Integer.parseInt(immed,2));
+					num1 = rs1.getValue();
+					if(misterConflict(inst_ex,num1,0)||misterConflict(inst_ma, num1, 0)||misterConflict(inst_rw, num1, 0)){
+						conflict_check = true;
+					}
 					newInst.setSourceOperand1(rs1);
 					newInst.setSourceOperand2(rd);
 					newInst.setDestinationOperand(rs2);
@@ -156,6 +194,11 @@ public class OperandFetch {
 						immedi = twosComplement(immedi);
 						imme.setValue(-1*Integer.parseInt(immedi,2));
 					}
+					num1 = rs1.getValue();
+					num2 = rd.getValue();
+					if(misterConflict(inst_ex,num1,num2)||misterConflict(inst_ma, num1, num2)||misterConflict(inst_rw, num1, num2)){
+						conflict_check = true;
+					}
 					newInst.setSourceOperand1(rs1);
 					newInst.setSourceOperand2(rd);
 					newInst.setDestinationOperand(imme);
@@ -165,6 +208,10 @@ public class OperandFetch {
 				default:
 					break;
 					
+			}
+			if(conflict_check == true){
+				IF_LatchE.setIF_enable(false);
+				OF_EX_Latch.setNop(true);
 			}
 			OF_EX_Latch.setInstruction(newInst);
 			IF_OF_Latch.setOF_enable(false);
