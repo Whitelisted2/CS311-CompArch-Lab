@@ -211,7 +211,7 @@ public class OperandFetch {
 			}
 			if(conflict_check == true){
 				IF_LatchE.setIF_enable(false);
-				OF_EX_Latch.setNop(true);
+				OF_EX_Latch.setIsNOP(true);
 			}
 			OF_EX_Latch.setInstruction(newInst);
 			IF_OF_Latch.setOF_enable(false);

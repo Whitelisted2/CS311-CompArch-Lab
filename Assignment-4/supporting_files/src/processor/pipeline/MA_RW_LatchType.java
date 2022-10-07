@@ -5,6 +5,7 @@ import generic.Instruction;
 public class MA_RW_LatchType {
 	
 	boolean RW_enable;
+	boolean nop;
 	Instruction instruction;
 	int ldResult;
 	int aluResult;
@@ -13,17 +14,20 @@ public class MA_RW_LatchType {
 	public MA_RW_LatchType()
 	{
 		RW_enable = false;
+		nop = false;
 	}
 
 	public MA_RW_LatchType(boolean rW_enable)
 	{
 		RW_enable = rW_enable;
+		nop = false;
 	}
 
 	public MA_RW_LatchType(boolean rW_enable, Instruction instruction)
 	{
 		RW_enable = rW_enable;
 		this.instruction = instruction;
+		nop = false;
 	}
 
 	public MA_RW_LatchType(boolean rW_enable, Instruction instruction, int LdResult)
@@ -31,6 +35,7 @@ public class MA_RW_LatchType {
 		RW_enable = rW_enable;
 		this.instruction = instruction;
 		this.ldResult = LdResult;
+		nop = false;
 	}
 
 	public MA_RW_LatchType(boolean rW_enable, Instruction instruction, int LdResult, int aLuResult)
@@ -39,6 +44,7 @@ public class MA_RW_LatchType {
 		this.instruction = instruction;
 		this.ldResult = LdResult;
 		this.aluResult = aLuResult;
+		nop = false;
 	}
 
 	// enable
@@ -81,6 +87,13 @@ public class MA_RW_LatchType {
 	public void setaluResult(int aLuResult)
 	{
 		aluResult = aLuResult;
+	}
+
+	public boolean getIsNOP(){
+		return nop;
+	}
+	public void setIsNOP(boolean Nop){
+		nop = Nop;
 	}
 
 }

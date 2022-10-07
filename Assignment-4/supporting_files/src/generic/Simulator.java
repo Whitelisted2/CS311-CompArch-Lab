@@ -69,17 +69,6 @@ public class Simulator {
 			processor.getOFUnit().performOF();
 			processor.getIFUnit().performIF();
 			Clock.incrementClock();
-
-			// processor.getIFUnit().performIF();
-			// Clock.incrementClock();
-			// processor.getOFUnit().performOF();
-			// Clock.incrementClock();
-			// processor.getEXUnit().performEX();
-			// Clock.incrementClock();
-			// processor.getMAUnit().performMA();
-			// Clock.incrementClock();
-			// processor.getRWUnit().performRW();
-			// System.out.println(processor.getRegisterFile().getContentsAsString()); 
 			++numinst;
 			++numcycles;
 		}
@@ -90,6 +79,9 @@ public class Simulator {
 		Statistics.setNumberOfCycles(numcycles);
 		Statistics.setCPI(numinst, numcycles);
 		Statistics.setIPC(numinst, numcycles);
+		System.out.println("Number of Cycles: " + Statistics.getNumberOfCycles());
+		System.out.println("Number of OF Stalls: " + (Statistics.getNumberOfInstructions() - Statistics.getNumberOfRWInstructions()));
+		System.out.println("Number of Wrong Branch Instructions: " + Statistics.getNumberOfBranchTaken());
 	}
 	
 	public static void setSimulationComplete(boolean value)

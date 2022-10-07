@@ -2,31 +2,38 @@ package processor.pipeline;
 import generic.Instruction;
 import generic.Operand.OperandType;
 import processor.Processor;
+import generic.Statistics;
 
 public class Execute {
 	Processor containingProcessor;
 	OF_EX_LatchType OF_EX_Latch;
 	EX_MA_LatchType EX_MA_Latch;
 	EX_IF_LatchType EX_IF_Latch;
+	IF_OF_LatchType IF_OF_Latch;
+	IF_EnableLatchType IF_EnableLatch;
 	private boolean b;
 	
-	public Execute(Processor containingProcessor, OF_EX_LatchType oF_EX_Latch, EX_MA_LatchType eX_MA_Latch, EX_IF_LatchType eX_IF_Latch)
+	public Execute(Processor containingProcessor, OF_EX_LatchType oF_EX_Latch, EX_MA_LatchType eX_MA_Latch, EX_IF_LatchType eX_IF_Latch, IF_OF_LatchType iF_OF_Latch, IF_EnableLatchType iF_EnableLatch)
 	{
 		this.containingProcessor = containingProcessor;
 		this.OF_EX_Latch = oF_EX_Latch;
 		this.EX_MA_Latch = eX_MA_Latch;
 		this.EX_IF_Latch = eX_IF_Latch;
+		this.IF_OF_Latch = iF_OF_Latch;
+		this.IF_EnableLatch = iF_EnableLatch;
 	}
 	
 
 	public void performEX()
 	{
 		boolean jmpRes = false;
-		/* blabla
-		 * 
-		 */
-		if(OF_EX_Latch.isEX_enable()){
+		if(OF_EX_Latch.getIsNOP()){
+			EX_MA_Latch.setIsNOP(true);
+			OF_EX_Latch.setIsNOP(false);
+			EX_MA_Latch.setInstruction(null);
+		} else if(OF_EX_Latch.isEX_enable()){
 			Instruction instruction = OF_EX_Latch.getInstruction();
+			System.out.println("EX: " + instruction);
 			EX_MA_Latch.setInstruction(instruction);
 			String opType = instruction.getOperationType().toString();
 			int nowPc = containingProcessor.getRegisterFile().programCounter -1;
@@ -128,6 +135,10 @@ public class Execute {
 						System.out.print("Issue detected in R3 type switch");
 				}}
 			else if(opType.equals("jmp")){
+				Statistics.setNumberOfBranchTaken(2 + Statistics.getNumberOfBranchTaken());
+				IF_EnableLatch.setIF_enable(false);
+				IF_OF_Latch.setOF_enable(false);
+				OF_EX_Latch.setEX_enable(false);
 				OperandType jmpType = instruction.getDestinationOperand().getOperandType();
 				int immed = 0;
 				if(jmpType == OperandType.Immediate)
@@ -149,6 +160,10 @@ public class Execute {
 				int rs1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
 				int rd = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand2().getValue());
 				int immed = instruction.getDestinationOperand().getValue();
+				Statistics.setNumberOfBranchTaken(2 + Statistics.getNumberOfBranchTaken());
+				IF_EnableLatch.setIF_enable(false);
+				IF_OF_Latch.setOF_enable(false);
+				OF_EX_Latch.setEX_enable(false);
 				switch(opType){
 					case "beq":
 						if(rs1==rd){

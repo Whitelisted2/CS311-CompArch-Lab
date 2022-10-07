@@ -19,7 +19,10 @@ public class RegisterWrite {
 	
 	public void performRW()
 	{
-		if(MA_RW_Latch.isRW_enable())
+		if(MA_RW_Latch.getIsNOP()){
+			MA_RW_Latch.setIsNOP(false);
+		}
+		else if(MA_RW_Latch.isRW_enable())
 		{
 			Instruction instruction = MA_RW_Latch.getInstruction();
 			String op = instruction.getOperationType().toString();

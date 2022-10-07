@@ -6,10 +6,12 @@ public class OF_EX_LatchType {
 	
 	boolean EX_enable;
 	Instruction instruction;
+	boolean nop;
 	
 	// constructors
 	public OF_EX_LatchType() {  // constructor with no parameters, default enable = false
 		EX_enable = false;
+		nop = false;
 	}
 
 	public OF_EX_LatchType(boolean eX_enable) {  // constructor that sets enable as well
@@ -39,4 +41,10 @@ public class OF_EX_LatchType {
 		return this.instruction;
 	}
 
+	public boolean getIsNOP(){
+		return nop;
+	}
+	public void setIsNOP(boolean Nop){
+		nop = Nop;
+	}
 }

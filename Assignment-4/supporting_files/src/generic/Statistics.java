@@ -9,6 +9,9 @@ public class Statistics {
 	static int numberOfCycles;
 	static float iPC;
 	static float cPI;
+	static int num_OFInstructions;
+	static int num_BranchTaken;
+	static int num_RWInstructions;
 	
 
 	public static void printStatistics(String statFile)
@@ -60,5 +63,28 @@ public class Statistics {
 
 	public static float getCPI() {
 		return cPI;
+	}
+	public static void setNumberOfOFInstructions(int n) {
+		Statistics.num_OFInstructions = n;
+	}
+	
+	public static int getNumberOfOFInstructions() {
+		return num_OFInstructions;
+	}
+	
+	public static void setNumberOfBranchTaken(int n) {
+		Statistics.num_BranchTaken = n;
+	}
+	
+	public static int getNumberOfBranchTaken() {
+		return num_BranchTaken;
+	}
+	
+	public static void setnumberOfRWInstructions(int n) {
+		Statistics.num_RWInstructions = n;
+	}
+	
+	public static int getNumberOfRWInstructions() {
+		return num_RWInstructions;
 	}
 }

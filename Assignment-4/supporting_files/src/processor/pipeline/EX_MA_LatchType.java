@@ -5,6 +5,7 @@ import generic.Instruction;
 public class EX_MA_LatchType {
 	
 	boolean MA_enable;
+	boolean nop;
 	Instruction instruction;
 	int aluResult;
 	
@@ -12,6 +13,7 @@ public class EX_MA_LatchType {
 	public EX_MA_LatchType()
 	{
 		MA_enable = false;
+		nop = false;
 	}
 	
 	public EX_MA_LatchType(boolean mA_enable)
@@ -61,5 +63,14 @@ public class EX_MA_LatchType {
 	public void setInstruction(Instruction iNstruction)
 	{
 		instruction = iNstruction;
+	}
+
+	// nop
+	public boolean getIsNOP(){
+		return nop;
+	}
+
+	public void setIsNOP(boolean Nop){
+		nop = Nop;
 	}
 }
