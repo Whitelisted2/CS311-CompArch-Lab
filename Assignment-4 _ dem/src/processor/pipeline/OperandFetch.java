@@ -54,14 +54,14 @@ public class OperandFetch {
 	
 	public static boolean misterConflict(Instruction instruction, int reg_1, int reg_2) {
 		if(instruction!=null && instruction.getOperationType()!=null){
-		int inst_ordinal =instruction.getOperationType().ordinal();
-		if ((inst_ordinal <= 21 && inst_ordinal % 2 == 0) || (inst_ordinal <= 21 && inst_ordinal % 2 != 0) || inst_ordinal == 22 || inst_ordinal == 23) {
+		int instNumber =instruction.getOperationType().ordinal();
+		if ((instNumber <= 21 && instNumber % 2 == 0) || (instNumber <= 21 && instNumber % 2 != 0) || instNumber == 22 || instNumber == 23) {
 			int dest_reg = instruction != null ? instruction.getDestinationOperand().getValue() : -1;
 			if (reg_1 == dest_reg || reg_2 == dest_reg) {
 				return true;
 			}
 		} 
-		else if((inst_ordinal == 6 || inst_ordinal ==7)&&(reg_1 == 31)||reg_2 == 31){
+		else if((instNumber == 6 || instNumber ==7)&&(reg_1 == 31)||reg_2 == 31){
 			return true;
 		}
 	}

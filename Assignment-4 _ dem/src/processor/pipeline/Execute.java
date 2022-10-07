@@ -2,7 +2,7 @@ package processor.pipeline;
 
 import processor.Processor;
 
-import java.util.Arrays;
+// import java.util.Arrays;
 
 import generic.Instruction;
 import generic.Instruction.OperationType;
@@ -30,7 +30,7 @@ public class Execute {
 
 	public void performEX() {
 		if (OF_EX_Latch.getIsNOP()) {
-			EX_MA_Latch.setIsNOP(true);
+			EX_MA_Latch.setIsNop(true);
 			OF_EX_Latch.setIsNOP(false);
 			EX_MA_Latch.setInstruction(null);
 		} else if (OF_EX_Latch.isEX_enable()) {
