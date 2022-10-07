@@ -9,7 +9,6 @@ public class Statistics {
 	static int numberOfCycles;
 	static float iPC;
 	static float cPI;
-	static int num_OFInstructions;
 	static int num_BranchTaken;
 	static int num_RWInstructions;
 	
@@ -24,6 +23,8 @@ public class Statistics {
 			writer.println("Number of cycles taken = " + numberOfCycles);
 			writer.println("IPC = " + iPC);
 			writer.println("CPI = " + cPI);
+			System.out.println("Number of OF Stalls: " + (numberOfInstructions - num_RWInstructions));
+			System.out.println("Number of Wrong Branch Instructions: " + num_BranchTaken);
 			writer.close();
 		}
 		catch(Exception e)
@@ -65,11 +66,11 @@ public class Statistics {
 		return cPI;
 	}
 	public static void setNumberOfOFInstructions(int n) {
-		Statistics.num_OFInstructions = n;
+		Statistics.numberOfInstructions = n;
 	}
 	
 	public static int getNumberOfOFInstructions() {
-		return num_OFInstructions;
+		return numberOfInstructions;
 	}
 	
 	public static void setNumberOfBranchTaken(int n) {
