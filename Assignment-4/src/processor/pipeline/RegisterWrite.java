@@ -2,6 +2,7 @@ package processor.pipeline;
 
 import generic.Instruction;
 import generic.Simulator;
+import generic.Statistics;
 // import generic.Instruction.OperationType;
 import processor.Processor;
 
@@ -26,6 +27,7 @@ public class RegisterWrite {
 		{
 			Instruction instruction = MA_RW_Latch.getInstruction();
 			String op = instruction.getOperationType().toString();
+			Statistics.setnumberOfRegisterWriteInstructions(Statistics.getNumberOfRegisterWriteInstructions() + 1);
 			// System.out.print(containingProcessor.getRegisterFile().getValue(1));
 			// int aluResult = MA_RW_Latch.getaluResult();
 			if(op.equals("load")){
