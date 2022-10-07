@@ -8,12 +8,12 @@ public class MA_RW_LatchType {
 	Instruction instruction;
 	int load_result;
 	int alu_result;
-	boolean NOP;
+	boolean nop;
 	
 	public MA_RW_LatchType()
 	{
 		RW_enable = false;
-		NOP = false;
+		nop = false;
 	}
 
 	public boolean isRW_enable() {
@@ -32,27 +32,27 @@ public class MA_RW_LatchType {
 		instruction = inst;
 	}
 
-	public void setLoad_result(int result) {
+	public void setldResult(int result) {
 		load_result = result;
 	}
 
-	public int getLoad_result() {
+	public int getldResult() {
 		return load_result;
 	}
 
-	public int getALU_result() {
+	public int getaluResult() {
 		return alu_result;
 	}
 
-	public void setALU_result(int result) {
+	public void setaluResult(int result) {
 		alu_result = result;
 	}
 	
-	public boolean getIsNOP() {
-		return NOP;
+	public boolean getIsNop() {
+		return nop;
 	}
 	
-	public void setIsNOP(boolean is_NOP) {
-		NOP = is_NOP;
+	public void setIsNop(boolean isNop) {
+		nop = isNop;
 	}
 }

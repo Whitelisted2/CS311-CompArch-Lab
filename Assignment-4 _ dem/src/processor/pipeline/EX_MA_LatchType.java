@@ -6,13 +6,13 @@ public class EX_MA_LatchType {
 	
 	boolean MA_enable;
 	int alu_result;
-	boolean NOP;
+	boolean nop;
 	Instruction instruction;
 
 	public EX_MA_LatchType()
 	{
 		MA_enable = false;
-		NOP = false;
+		nop = false;
 	}
 
 	public boolean isMA_enable() {
@@ -31,7 +31,7 @@ public class EX_MA_LatchType {
 		instruction = inst;
 	}
 
-	public int getALU_result() {
+	public int getaluResult() {
 		return alu_result;
 	}
 
@@ -39,12 +39,12 @@ public class EX_MA_LatchType {
 		alu_result = result;
 	}
 	
-	public boolean getIsNOP() {
-		return NOP;
+	public boolean getIsNop() {
+		return nop;
 	}
 	
-	public void setIsNOP(boolean is_NOP) {
-		NOP = is_NOP;
+	public void setIsNop(boolean isNop) {
+		nop = isNop;
 	}
 
 
