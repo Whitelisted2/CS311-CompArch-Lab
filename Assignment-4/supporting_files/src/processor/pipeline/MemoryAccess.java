@@ -44,7 +44,7 @@ public class MemoryAccess {
 				containingProcessor.getMainMemory().setWord(aluResult, inp);
 
 			}
-			if(op.equals("end)")){
+			if(op.equals("end")){
 				IF_EnableLatch.setIF_enable(false);
 			}
 

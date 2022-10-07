@@ -112,7 +112,6 @@ public class Execute {
 				case divi:
 					alu_result = op1 / op2;
 					int remainder = op1 % op2;
-					System.out.println(alu_result + ", " + remainder + "........");
 					containingProcessor.getRegisterFile().setValue(31, remainder);
 					break;
 				case andi:
@@ -195,10 +194,8 @@ public class Execute {
 					break;
 				}
 			}
-//			System.out.println("alu_result" + Integer.toString(alu_result));
 			EX_MA_Latch.setALU_result(alu_result);
 
-			// OF_EX_Latch.setEX_enable(false);
 			EX_MA_Latch.setMA_enable(true);
 		}
 	}
