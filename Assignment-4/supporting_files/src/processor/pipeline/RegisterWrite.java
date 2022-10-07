@@ -2,7 +2,7 @@ package processor.pipeline;
 
 import generic.Instruction;
 import generic.Simulator;
-import generic.Instruction.OperationType;
+// import generic.Instruction.OperationType;
 import processor.Processor;
 
 public class RegisterWrite {
@@ -45,6 +45,7 @@ public class RegisterWrite {
 			// if instruction being processed is an end instruction, remember to call Simulator.setSimulationComplete(true);
 			
 			MA_RW_Latch.setRW_enable(false);
+			if(!op.equals("end"))
 			IF_EnableLatch.setIF_enable(true);
 		}
 	}

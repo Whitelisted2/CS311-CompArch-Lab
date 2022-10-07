@@ -26,6 +26,8 @@ public class Execute {
 
 	public void performEX()
 	{
+		int aluResult = 0;
+
 		boolean jmpRes = false;
 		if(OF_EX_Latch.getIsNOP()){
 			EX_MA_Latch.setIsNOP(true);
@@ -38,7 +40,6 @@ public class Execute {
 			String opType = instruction.getOperationType().toString();
 			int nowPc = containingProcessor.getRegisterFile().programCounter -1;
 			
-			int aluResult = 0;
 			b = opType.equals("addi") || opType.equals("subi") || opType.equals("muli") || opType.equals("divi") || opType.equals("andi") || opType.equals("ori") || opType.equals("xori") || opType.equals("slti") || opType.equals("slli") || opType.equals("srli") || opType.equals("srai") || opType.equals("load") || opType.equals("store");
 			if(b){
 				int rs1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
@@ -200,11 +201,12 @@ public class Execute {
 				}
 			}
 			// System.out.println("At " + containingProcessor.getRegisterFile().getProgramCounter()+ " with " + aluResult + " and optype " + opType);
+			EX_MA_Latch.setMA_enable(true);
 			EX_MA_Latch.setaluResult(aluResult);
 		}
-		OF_EX_Latch.setEX_enable(false);
-		if(jmpRes == false)
-		{EX_MA_Latch.setMA_enable(true);}
+		// OF_EX_Latch.setEX_enable(false);
+
+
 		}
 
 

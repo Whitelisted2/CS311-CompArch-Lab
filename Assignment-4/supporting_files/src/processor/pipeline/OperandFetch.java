@@ -56,7 +56,9 @@ public class OperandFetch {
 	}
 
 	public boolean misterConflict(Instruction instC, int regA, int regB){
-		if(instC != null){
+		if(instC != null&&!instC.getOperationType().equals(OperationType.end)){
+			// System.out.println("Checking conflicts for " + instC.getOperationType());
+			System.out.println("Instruction in conflicter : "+ instC);
 			int dest_op = instC.getDestinationOperand().getValue();
 			if(dest_op == regA || dest_op == regB){
 				System.out.println("Data Conflict!");
@@ -204,6 +206,7 @@ public class OperandFetch {
 					newInst.setDestinationOperand(imme);
 					break;
 				case end:
+					// System.out.println("Inside end");
 					break;
 				default:
 					break;
@@ -212,9 +215,10 @@ public class OperandFetch {
 			if(conflict_check == true){
 				IF_LatchE.setIF_enable(false);
 				OF_EX_Latch.setIsNOP(true);
+				OF_EX_Latch.setInstruction(null);
 			}
-			OF_EX_Latch.setInstruction(newInst);
-			IF_OF_Latch.setOF_enable(false);
+			else {OF_EX_Latch.setInstruction(newInst);}
+			// IF_OF_Latch.setOF_enable(false);
 			OF_EX_Latch.setEX_enable(true);
 		}
 	}
