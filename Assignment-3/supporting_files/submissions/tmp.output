@@ -1,0 +1,11 @@
+Buildfile: /mnt/c/Users/bsidd/Desktop/CS311 CA_Lab/Submissions/Assignment-3/supporting_files/submissions/build.xml
+
+build-subprojects:
+
+init:
+    [mkdir] Created dir: /mnt/c/Users/bsidd/Desktop/CS311 CA_Lab/Submissions/Assignment-3/supporting_files/submissions/bin
+     [copy] Copying 1 file to /mnt/c/Users/bsidd/Desktop/CS311 CA_Lab/Submissions/Assignment-3/supporting_files/submissions/bin
+
+build-project:
+    [javac] Compiling 22 source files to /mnt/c/Users/bsidd/Desktop/CS311 CA_Lab/Submissions/Assignment-3/supporting_files/submissions/bin
+    [javac] warning: [options] bootstrap class path not set in conjunction with -source 8
