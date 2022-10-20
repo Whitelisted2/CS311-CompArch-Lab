@@ -14,6 +14,7 @@ public class Simulator {
 		
 	static Processor processor;
 	static boolean simulationComplete;
+	static EventQueue eventQueue;
 	
 	public static void setupSimulation(String assemblyProgramFile, Processor p)
 	{
@@ -27,6 +28,10 @@ public class Simulator {
 		}
 		
 		simulationComplete = false;
+	}
+
+	public static EventQueue getEventQueue() { 
+		return eventQueue ; 
 	}
 	
 	static void loadProgram(String assemblyProgramFile) throws IOException
