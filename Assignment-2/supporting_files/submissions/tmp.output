@@ -1,0 +1,53 @@
+Symbol Table :
+[{a=0, swap=24, main=9, youngloop=16, enditall=27, n=8, elderloop=12}]
+
+Parsed instructions :
+[[PC=9	load	[Register:0]	[Label:n]	[Register:3]
+, PC=10	addi	[Register:0]	[Immediate:0]	[Register:4]
+, PC=11	subi	[Register:3]	[Immediate:1]	[Register:3]
+, PC=12	beq	[Register:4]	[Register:3]	[Label:enditall]
+, PC=13	sub	[Register:3]	[Register:4]	[Register:9]
+, PC=14	addi	[Register:4]	[Immediate:1]	[Register:4]
+, PC=15	addi	[Register:0]	[Immediate:0]	[Register:5]
+, PC=16	beq	[Register:5]	[Register:9]	[Label:elderloop]
+, PC=17	addi	[Register:5]	[Immediate:1]	[Register:6]
+, PC=18	load	[Register:5]	[Label:a]	[Register:7]
+, PC=19	load	[Register:6]	[Label:a]	[Register:8]
+, PC=20	addi	[Register:5]	[Immediate:0]	[Register:28]
+, PC=21	addi	[Register:5]	[Immediate:1]	[Register:5]
+, PC=22	bgt	[Register:8]	[Register:7]	[Label:swap]
+, PC=23	jmp	null	null	[Label:youngloop]
+, PC=24	store	[Register:8]	[Label:a]	[Register:28]
+, PC=25	store	[Register:7]	[Label:a]	[Register:6]
+, PC=26	jmp	null	null	[Label:youngloop]
+, PC=27	end	null	null	null
+]]
+10110000000001100000000000001000
+00001000000010000000000000000000
+00011000110001100000000000000001
+pc= 12
+offset= 15
+11001001000001100000000000001111
+00010000110010001001000000000000
+00001001000010000000000000000001
+00001000000010100000000000000000
+pc= 16
+offset= -4
+11001001010100111111111111111100
+00001001010011000000000000000001
+10110001010011100000000000000000
+10110001100100000000000000000000
+00001001011110000000000000000000
+00001001010010100000000000000001
+pc= 22
+offset= 2
+11100010000011100000000000000010
+pc= 23
+offset= -7
+11000000001111111111111111111001
+10111010001110000000000000000000
+10111001110011000000000000000000
+pc= 26
+offset= -10
+11000000001111111111111111110110
+11101000000000000000000000000000

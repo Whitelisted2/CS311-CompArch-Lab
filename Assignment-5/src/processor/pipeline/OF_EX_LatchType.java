@@ -11,8 +11,6 @@ public class OF_EX_LatchType {
 
 	boolean isNOP;
 	int instPC;
-	int rs1, rs2, rd, imm, rs1addr, rs2addr;
-	String opcode;
 
 	public OF_EX_LatchType()
 	{
@@ -20,14 +18,6 @@ public class OF_EX_LatchType {
 		NOP = false;
 
 		isNOP = false;
-		rs1 = 999999;
-		rs2 = 999999;
-		rd = 999999;
-		imm = 999999;
-		opcode = "999999";
-		instPC = -1;
-		rs1addr = 45;
-		rs2addr = 45;
 		isBusy = false;
 
 	}

@@ -29,70 +29,82 @@ public class Execute {
 	}
 
 	public void performEX() {
-		if (OF_EX_Latch.getIsNOP()) {
+
+		if (EX_MA_Latch.isBusy == true)
+			OF_EX_Latch.isBusy = true;
+		else
+			OF_EX_Latch.isBusy = false;
+
+		if (OF_EX_Latch.getIsNOP() && OF_EX_Latch.isEX_enable()) {
 			EX_MA_Latch.setIsNop(true);
 			OF_EX_Latch.setIsNOP(false);
 			EX_MA_Latch.setInstruction(null);
-		} else if (OF_EX_Latch.isEX_enable()) {
+		} else if (OF_EX_Latch.isEX_enable() && EX_MA_Latch.isBusy == false) {
 			Instruction instruction = OF_EX_Latch.getInstruction();
 			EX_MA_Latch.setInstruction(instruction);
 			OperationType op_type = instruction.getOperationType();
 			String opType = op_type.toString();
 			int currentPC = containingProcessor.getRegisterFile().getProgramCounter() - 1;
-			boolean b = opType.equals("addi") || opType.equals("subi") || opType.equals("muli") || opType.equals("divi") || opType.equals("andi") || opType.equals("ori") || opType.equals("xori") || opType.equals("slti") || opType.equals("slli") || opType.equals("srli") || opType.equals("srai") || opType.equals("load");
-			if (op_type.equals(OperationType.beq) || op_type.equals(OperationType.blt) ||op_type.equals(OperationType.bgt) || op_type.equals(OperationType.bne) || op_type.equals(OperationType.jmp) || op_type.equals(OperationType.end)) {
+			boolean b = opType.equals("addi") || opType.equals("subi") || opType.equals("muli") || opType.equals("divi")
+					|| opType.equals("andi") || opType.equals("ori") || opType.equals("xori") || opType.equals("slti")
+					|| opType.equals("slli") || opType.equals("srli") || opType.equals("srai") || opType.equals("load");
+			if (op_type.equals(OperationType.beq) || op_type.equals(OperationType.blt)
+					|| op_type.equals(OperationType.bgt) || op_type.equals(OperationType.bne)
+					|| op_type.equals(OperationType.jmp) || op_type.equals(OperationType.end)) {
 				Statistics.setNumberOfBranchTaken(Statistics.getNumberOfBranchTaken() + 2);
 				IF_EnableLatch.setIF_enable(false);
 				IF_OF_Latch.setOF_enable(false);
 				OF_EX_Latch.setEX_enable(false);
 			}
-			
+
 			int alu_result = 0;
 
-			if (opType.equals("add") || opType.equals("sub") || opType.equals("mul") || opType.equals("div") || opType.equals("and") || opType.equals("or") || opType.equals("xor") || opType.equals("slt") || opType.equals("sll") || opType.equals("srl") || opType.equals("sra")) {
+			if (opType.equals("add") || opType.equals("sub") || opType.equals("mul") || opType.equals("div")
+					|| opType.equals("and") || opType.equals("or") || opType.equals("xor") || opType.equals("slt")
+					|| opType.equals("sll") || opType.equals("srl") || opType.equals("sra")) {
 				int op1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
 				int op2 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand2().getValue());
 				switch (op_type) {
-				case add:
-					alu_result = op1 + op2;
-					break;
-				case sub:
-					alu_result = op1 - op2;
-					break;
-				case mul:
-					alu_result = op1 * op2;
-					break;
-				case div:
-					alu_result = op1 / op2;
-					int remainder = op1 % op2;
-					containingProcessor.getRegisterFile().setValue(31, remainder);
-					break;
-				case and:
-					alu_result = op1 & op2;
-					break;
-				case or:
-					alu_result = op1 | op2;
-					break;
-				case xor:
-					alu_result = op1 ^ op2;
-					break;
-				case slt:
-					if (op1 < op2)
-						alu_result = 1;
-					else
-						alu_result = 0;
-					break;
-				case sll:
-					alu_result = op1 << op2;
-					break;
-				case srl:
-					alu_result = op1 >>> op2;
-					break;
-				case sra:
-					alu_result = op1 >> op2;
-					break;
-				default:
-					break;
+					case add:
+						alu_result = op1 + op2;
+						break;
+					case sub:
+						alu_result = op1 - op2;
+						break;
+					case mul:
+						alu_result = op1 * op2;
+						break;
+					case div:
+						alu_result = op1 / op2;
+						int remainder = op1 % op2;
+						containingProcessor.getRegisterFile().setValue(31, remainder);
+						break;
+					case and:
+						alu_result = op1 & op2;
+						break;
+					case or:
+						alu_result = op1 | op2;
+						break;
+					case xor:
+						alu_result = op1 ^ op2;
+						break;
+					case slt:
+						if (op1 < op2)
+							alu_result = 1;
+						else
+							alu_result = 0;
+						break;
+					case sll:
+						alu_result = op1 << op2;
+						break;
+					case srl:
+						alu_result = op1 >>> op2;
+						break;
+					case sra:
+						alu_result = op1 >> op2;
+						break;
+					default:
+						break;
 				}
 			} else if (b) {
 				int i = instruction.getSourceOperand1().getValue();
@@ -100,49 +112,49 @@ public class Execute {
 				int op2 = instruction.getSourceOperand2().getValue();
 
 				switch (op_type) {
-				case addi:
-					alu_result = op1 + op2;
-					break;
-				case subi:
-					alu_result = op1 - op2;
-					break;
-				case muli:
-					alu_result = op1 * op2;
-					break;
-				case divi:
-					alu_result = op1 / op2;
-					int remainder = op1 % op2;
-					containingProcessor.getRegisterFile().setValue(31, remainder);
-					break;
-				case andi:
-					alu_result = op1 & op2;
-					break;
-				case ori:
-					alu_result = op1 | op2;
-					break;
-				case xori:
-					alu_result = op1 ^ op2;
-					break;
-				case slti:
-					if (op1 < op2)
-						alu_result = 1;
-					else
-						alu_result = 0;
-					break;
-				case slli:
-					alu_result = op1 << op2;
-					break;
-				case srli:
-					alu_result = op1 >>> op2;
-					break;
-				case srai:
-					alu_result = op1 >> op2;
-					break;
-				case load:
-					alu_result = op1 + op2;
-					break;
-				default:
-					break;
+					case addi:
+						alu_result = op1 + op2;
+						break;
+					case subi:
+						alu_result = op1 - op2;
+						break;
+					case muli:
+						alu_result = op1 * op2;
+						break;
+					case divi:
+						alu_result = op1 / op2;
+						int remainder = op1 % op2;
+						containingProcessor.getRegisterFile().setValue(31, remainder);
+						break;
+					case andi:
+						alu_result = op1 & op2;
+						break;
+					case ori:
+						alu_result = op1 | op2;
+						break;
+					case xori:
+						alu_result = op1 ^ op2;
+						break;
+					case slti:
+						if (op1 < op2)
+							alu_result = 1;
+						else
+							alu_result = 0;
+						break;
+					case slli:
+						alu_result = op1 << op2;
+						break;
+					case srli:
+						alu_result = op1 >>> op2;
+						break;
+					case srai:
+						alu_result = op1 >> op2;
+						break;
+					case load:
+						alu_result = op1 + op2;
+						break;
+					default:
+						break;
 				}
 			} else if (op_type.equals(OperationType.store)) {
 				int op1 = containingProcessor.getRegisterFile()
@@ -160,38 +172,39 @@ public class Execute {
 				}
 				alu_result = imm + currentPC;
 				EX_IF_Latch.setIS_Enable(true, alu_result);
-			} else if (op_type.equals(OperationType.beq)||op_type.equals(OperationType.bne)||op_type.equals(OperationType.blt)||op_type.equals(OperationType.bgt)) {
+			} else if (op_type.equals(OperationType.beq) || op_type.equals(OperationType.bne)
+					|| op_type.equals(OperationType.blt) || op_type.equals(OperationType.bgt)) {
 				int op1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
 				int op2 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand2().getValue());
 				int imm = instruction.getDestinationOperand().getValue();
 				switch (op_type) {
-				case beq:
-					if (op1 == op2) {
-						alu_result = imm + currentPC;
-						EX_IF_Latch.setIS_Enable(true, alu_result);
-					}
-					break;
-				case bne:
-					if (op1 != op2) {
-						alu_result = imm + currentPC;
-						EX_IF_Latch.setIS_Enable(true, alu_result);
-					}
+					case beq:
+						if (op1 == op2) {
+							alu_result = imm + currentPC;
+							EX_IF_Latch.setIS_Enable(true, alu_result);
+						}
+						break;
+					case bne:
+						if (op1 != op2) {
+							alu_result = imm + currentPC;
+							EX_IF_Latch.setIS_Enable(true, alu_result);
+						}
 
-					break;
-				case blt:
-					if (op1 < op2) {
-						alu_result = imm + currentPC;
-						EX_IF_Latch.setIS_Enable(true, alu_result);
-					}
-					break;
-				case bgt:
-					if (op1 > op2) {
-						alu_result = imm + currentPC;
-						EX_IF_Latch.setIS_Enable(true, alu_result);
-					}
-					break;
-				default:
-					break;
+						break;
+					case blt:
+						if (op1 < op2) {
+							alu_result = imm + currentPC;
+							EX_IF_Latch.setIS_Enable(true, alu_result);
+						}
+						break;
+					case bgt:
+						if (op1 > op2) {
+							alu_result = imm + currentPC;
+							EX_IF_Latch.setIS_Enable(true, alu_result);
+						}
+						break;
+					default:
+						break;
 				}
 			}
 			EX_MA_Latch.setALU_result(alu_result);

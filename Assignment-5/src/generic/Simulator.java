@@ -8,7 +8,6 @@ import java.io.InputStream;
 
 import processor.Clock;
 import processor.Processor;
-import generic.Statistics;
 
 public class Simulator {
 		

@@ -5,7 +5,7 @@ import configuration.Configuration;
 import generic.*;
 import processor.Clock;
 
-public class InstructionFetch {
+public class InstructionFetch implements Element{
 	
 	Processor containingProcessor;
 	IF_EnableLatchType IF_EnableLatch;
@@ -73,7 +73,7 @@ public class InstructionFetch {
 		// }
 	}
 
-	// @Override ?????????
+	@Override
 	public void handleEvent(Event e) {
 		if(IF_OF_Latch.isBusy == true) {
 			System.out.println("IF OF Latch is busy !");
