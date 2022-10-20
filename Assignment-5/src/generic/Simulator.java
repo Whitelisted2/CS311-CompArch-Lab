@@ -15,9 +15,16 @@ public class Simulator {
 	static Processor processor;
 	static boolean simulationComplete;
 	static EventQueue eventQueue;
+	public static long storeresp;
+	public static int inst_count;
 	
 	public static void setupSimulation(String assemblyProgramFile, Processor p)
 	{
+		// ----------------------------
+		eventQueue = new EventQueue();
+		storeresp = 0;
+		inst_count = 0;
+
 		Simulator.processor = p;
 		try
 		{
@@ -28,10 +35,6 @@ public class Simulator {
 		}
 		
 		simulationComplete = false;
-	}
-
-	public static EventQueue getEventQueue() { 
-		return eventQueue ; 
 	}
 	
 	static void loadProgram(String assemblyProgramFile) throws IOException
@@ -57,28 +60,36 @@ public class Simulator {
 		}
 		DataInputStream dis = new DataInputStream(is);
 
-		int address = -1;
-		while(dis.available() > 0)
-		{
-			int next = dis.readInt();
-			if(address == -1)
+		try{
+			// 
+	
+			int address = -1;
+			while(dis.available() > 0)
 			{
-				processor.getRegisterFile().setProgramCounter(next);
+				int next = dis.readInt();
+				if(address == -1)
+				{
+					processor.getRegisterFile().setProgramCounter(next);
+				}
+				else
+				{
+					processor.getMainMemory().setWord(address, next);
+				}
+				address += 1;
 			}
-			else
-			{
-				processor.getMainMemory().setWord(address, next);
-			}
-			address += 1;
+			
+			processor.getRegisterFile().setValue(0, 0);
+			processor.getRegisterFile().setValue(1, 65535);
+			processor.getRegisterFile().setValue(2, 65535);
+			
+			//System.out.println(processor.getRegisterFile().getProgramCounter());
+			//String output = processor.getMainMemory().getContentsAsString(0, 15);
+			//System.out.println(output);
+
+			dis.close(); 
+		} catch(Exception e){
+			e.printStackTrace();
 		}
-        
-        processor.getRegisterFile().setValue(0, 0);
-        processor.getRegisterFile().setValue(1, 65535);
-        processor.getRegisterFile().setValue(2, 65535);
-        
-        //System.out.println(processor.getRegisterFile().getProgramCounter());
-        //String output = processor.getMainMemory().getContentsAsString(0, 15);
-        //System.out.println(output);
 	}
 			
 	public static void simulate()
