@@ -38,9 +38,9 @@ public class InstructionFetch implements Element{
 
 			currentPC = containingProcessor.getRegisterFile().getProgramCounter();
 			System.out.println("Current PC is " + currentPC);
-			int newInstruction = containingProcessor.getMainMemory().getWord(currentPC);
-			IF_OF_Latch.setInstruction(newInstruction);
-			containingProcessor.getRegisterFile().setProgramCounter(currentPC + 1);
+			// int newInstruction = containingProcessor.getMainMemory().getWord(currentPC);
+			// IF_OF_Latch.setInstruction(newInstruction);
+			// containingProcessor.getRegisterFile().setProgramCounter(currentPC + 1);
 			// System.out.println(" inside IF 1");
 			// String opcode = Integer.toBinaryString(newInstruction).substring(0,5);
 			// System.out.println(opcode);

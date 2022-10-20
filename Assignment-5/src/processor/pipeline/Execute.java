@@ -30,12 +30,13 @@ public class Execute {
 
 	public void performEX() {
 
-		if (EX_MA_Latch.isBusy == true)
+		if (EX_MA_Latch.isBusy == true){
 			OF_EX_Latch.isBusy = true;
+			return;}
 		else
 			OF_EX_Latch.isBusy = false;
 
-		if (OF_EX_Latch.getIsNOP() && OF_EX_Latch.isEX_enable()) {
+		if (OF_EX_Latch.getIsNOP()) {
 			EX_MA_Latch.setIsNop(true);
 			OF_EX_Latch.setIsNOP(false);
 			EX_MA_Latch.setInstruction(null);
@@ -64,6 +65,9 @@ public class Execute {
 					|| opType.equals("sll") || opType.equals("srl") || opType.equals("sra")) {
 				int op1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
 				int op2 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand2().getValue());
+				Simulator.getEventQueue().addEvent(new ExecutionCompleteEvent(Clock.getCurrentTime() + Configuration.ALU_latency, this, this));
+                    OF_EX_Latch.setEX_busy(true);
+                    EX_MA_Latch.setMA_enable(false);
 				switch (op_type) {
 					case add:
 						alu_result = op1 + op2;

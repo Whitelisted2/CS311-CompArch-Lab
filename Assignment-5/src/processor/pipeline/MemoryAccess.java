@@ -24,7 +24,7 @@ public class MemoryAccess implements Element {
 
 	public void performMA() {
 
-		if (EX_MA_Latch.getIsNop()) {
+		if (EX_MA_Latch.getIsNop()&& EX_MA_Latch.isMA_enable() && EX_MA_Latch.isBusy == false) {
 			MA_RW_Latch.setIsNop(true);
 			MA_RW_Latch.setInstruction(null);
 			EX_MA_Latch.setIsNop(false);
