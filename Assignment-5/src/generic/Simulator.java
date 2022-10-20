@@ -16,14 +16,13 @@ public class Simulator {
 	static boolean simulationComplete;
 	static EventQueue eventQueue;
 	public static long storeresp;
-	public static int inst_count;
-	
+	public static int inst_count;	
+
 	public static void setupSimulation(String assemblyProgramFile, Processor p)
 	{
 		// ----------------------------
 		eventQueue = new EventQueue();
 		storeresp = 0;
-		inst_count = 0;
 
 		Simulator.processor = p;
 		try
@@ -61,20 +60,23 @@ public class Simulator {
 		DataInputStream dis = new DataInputStream(is);
 
 		try{
-			// 
-	
-			int address = -1;
+				
+			int address = 0;
+			int pc = dis.readInt();
+			processor.getRegisterFile().setProgramCounter(pc);
+
 			while(dis.available() > 0)
 			{
-				int next = dis.readInt();
-				if(address == -1)
-				{
-					processor.getRegisterFile().setProgramCounter(next);
-				}
-				else
-				{
-					processor.getMainMemory().setWord(address, next);
-				}
+				// int next = dis.readInt();
+				// if(address == -1)
+				// {
+				// 	processor.getRegisterFile().setProgramCounter(next);
+				// }
+				// else
+				// {
+				int value = dis.readInt();
+				processor.getMainMemory().setWord(address, value);
+				// }
 				address += 1;
 			}
 			
@@ -91,23 +93,26 @@ public class Simulator {
 			e.printStackTrace();
 		}
 	}
+
+	public static EventQueue getEventQueue() {
+		return eventQueue;
+	}
 			
 	public static void simulate()
 	{
 		while(simulationComplete == false)
 		{
 			processor.getRWUnit().performRW();
-			Clock.incrementClock();
 			processor.getMAUnit().performMA();
-			Clock.incrementClock();	
 			processor.getEXUnit().performEX();
-			Clock.incrementClock();	
-			processor.getOFUnit().performOF();
-			Clock.incrementClock();
-			processor.getIFUnit().performIF();
-			Clock.incrementClock();
 
-			Statistics.setNumberOfInstructions(Statistics.getNumberOfInstructions() + 1);
+			eventQueue.processEvents();
+
+			processor.getOFUnit().performOF();
+			processor.getIFUnit().performIF();
+
+			Clock.incrementClock();
+			// Statistics.setNumberOfInstructions(Statistics.getNumberOfInstructions() + 1);
 			Statistics.setNumberOfCycles(Statistics.getNumberOfCycles() + 1);
 		}
 		

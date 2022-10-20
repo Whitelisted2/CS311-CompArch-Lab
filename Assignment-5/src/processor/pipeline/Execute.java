@@ -159,7 +159,7 @@ public class Execute {
 					imm = instruction.getDestinationOperand().getValue();
 				}
 				alu_result = imm + currentPC;
-				EX_IF_Latch.setIF_Enable(true, alu_result);
+				EX_IF_Latch.setIS_Enable(true, alu_result);
 			} else if (op_type.equals(OperationType.beq)||op_type.equals(OperationType.bne)||op_type.equals(OperationType.blt)||op_type.equals(OperationType.bgt)) {
 				int op1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
 				int op2 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand2().getValue());
@@ -168,26 +168,26 @@ public class Execute {
 				case beq:
 					if (op1 == op2) {
 						alu_result = imm + currentPC;
-						EX_IF_Latch.setIF_Enable(true, alu_result);
+						EX_IF_Latch.setIS_Enable(true, alu_result);
 					}
 					break;
 				case bne:
 					if (op1 != op2) {
 						alu_result = imm + currentPC;
-						EX_IF_Latch.setIF_Enable(true, alu_result);
+						EX_IF_Latch.setIS_Enable(true, alu_result);
 					}
 
 					break;
 				case blt:
 					if (op1 < op2) {
 						alu_result = imm + currentPC;
-						EX_IF_Latch.setIF_Enable(true, alu_result);
+						EX_IF_Latch.setIS_Enable(true, alu_result);
 					}
 					break;
 				case bgt:
 					if (op1 > op2) {
 						alu_result = imm + currentPC;
-						EX_IF_Latch.setIF_Enable(true, alu_result);
+						EX_IF_Latch.setIS_Enable(true, alu_result);
 					}
 					break;
 				default:

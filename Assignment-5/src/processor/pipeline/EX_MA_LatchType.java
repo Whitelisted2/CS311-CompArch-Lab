@@ -8,11 +8,29 @@ public class EX_MA_LatchType {
 	int alu_result;
 	boolean nop;
 	Instruction instruction;
+	boolean isBusy;
+
+	boolean isNOP;
+	int instPC;
+	int rs1, rs2, rd, imm, rs1addr, rs2addr;
+	String opcode;
 
 	public EX_MA_LatchType()
 	{
 		MA_enable = false;
 		nop = false;
+		isBusy = false;
+
+		isNOP = false;
+		rs1 = 999999;
+		rs2 = 999999;
+		rd = 999999;
+		imm = 999999;
+		opcode = "999999";
+		instPC = -1;
+		rs1addr = 45;
+		rs2addr = 45;
+		isBusy = false;
 	}
 
 	public boolean isMA_enable() {

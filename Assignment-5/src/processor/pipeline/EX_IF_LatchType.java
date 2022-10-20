@@ -4,22 +4,24 @@ public class EX_IF_LatchType {
 
 	boolean IS_enable;
 	int PC;
+	int offset;
 	
 	public EX_IF_LatchType()
 	{
 		IS_enable = false;
+		offset = 999999;
 	}
 
-	public boolean getIF_Enable() {
+	public boolean getIS_Enable() {
 		return IS_enable;
 	}
 
-	public void setIF_Enable(boolean iS_enable, int newPC) {
+	public void setIS_Enable(boolean iS_enable, int newPC) {
 		IS_enable = iS_enable;
 		PC = newPC;
 	}
 
-	public void setIF_Enable(boolean iS_enable) {
+	public void setIS_Enable(boolean iS_enable) {
 		IS_enable = iS_enable;
 	}
 
@@ -27,4 +29,7 @@ public class EX_IF_LatchType {
 		return PC;
 	}
 
+	public void setPC(int pC) {
+		this.PC = pC;
+	}
 }
