@@ -1,25 +1,17 @@
 package processor.pipeline;
 
 import processor.Processor;
-
-// import java.util.Arrays;
-
-import generic.Instruction;
-import generic.Instruction.OperationType;
-// import generic.Operand;
-import generic.Operand.OperandType;
-import generic.Statistics;
+import java.util.Arrays;
 
 public class Execute {
 	Processor containingProcessor;
+	IF_EnableLatchType IF_EnableLatch;
 	OF_EX_LatchType OF_EX_Latch;
 	EX_MA_LatchType EX_MA_Latch;
 	EX_IF_LatchType EX_IF_Latch;
 	IF_OF_LatchType IF_OF_Latch;
-	IF_EnableLatchType IF_EnableLatch;
-
-	public Execute(Processor containingProcessor, OF_EX_LatchType oF_EX_Latch, EX_MA_LatchType eX_MA_Latch,
-			EX_IF_LatchType eX_IF_Latch, IF_OF_LatchType iF_OF_Latch, IF_EnableLatchType iF_EnableLatch) {
+	
+	public Execute(Processor containingProcessor, IF_OF_LatchType iF_OF_Latch, OF_EX_LatchType oF_EX_Latch, EX_MA_LatchType eX_MA_Latch, EX_IF_LatchType eX_IF_Latch, IF_EnableLatchType iF_EnableLatch) {
 		this.containingProcessor = containingProcessor;
 		this.OF_EX_Latch = oF_EX_Latch;
 		this.EX_MA_Latch = eX_MA_Latch;
@@ -27,194 +19,241 @@ public class Execute {
 		this.IF_OF_Latch = iF_OF_Latch;
 		this.IF_EnableLatch = iF_EnableLatch;
 	}
+	
+	private static String toBinaryOfSpecificPrecision(int num, int lenOfTargetString) {
+		String binary = String.format("%" + lenOfTargetString + "s", Integer.toBinaryString(num)).replace(' ', '0');
+		return binary;
+	}
+	
+	/**
+	 * converts binary representation of number to signed integer
+	 * @param binary: Sring representation of binary form of number
+	 * @return: returns signed representation of given number
+	*/
+	private static int toSignedInteger(String binary) {
+		int n = 32 - binary.length();
+        char[] sign_ext = new char[n];
+        Arrays.fill(sign_ext, binary.charAt(0));
+        int signedInteger = (int) Long.parseLong(new String(sign_ext) + binary, 2);
+        return signedInteger;
+	}
 
+	private void loopAround(int num) {
+		for (int i = 0; i < num; i += 1)
+			toSignedInteger(toBinaryOfSpecificPrecision(i, 20));
+	}
+	
 	public void performEX() {
+		if(EX_MA_Latch.isBusy == true) OF_EX_Latch.isBusy = true;
+		else OF_EX_Latch.isBusy = false;
+		
+		int signedInt = toSignedInteger("001");
+		String binaryNum = toBinaryOfSpecificPrecision(signedInt, 5);
 
-		if (EX_MA_Latch.isBusy == true){
-			OF_EX_Latch.isBusy = true;
-			return;}
-		else
-			OF_EX_Latch.isBusy = false;
-
-		if (OF_EX_Latch.getIsNOP()) {
-			EX_MA_Latch.setIsNop(true);
-			OF_EX_Latch.setIsNOP(false);
-			EX_MA_Latch.setInstruction(null);
-		} else if (OF_EX_Latch.isEX_enable() && EX_MA_Latch.isBusy == false) {
-			Instruction instruction = OF_EX_Latch.getInstruction();
-			EX_MA_Latch.setInstruction(instruction);
-			OperationType op_type = instruction.getOperationType();
-			String opType = op_type.toString();
-			int currentPC = containingProcessor.getRegisterFile().getProgramCounter() - 1;
-			boolean b = opType.equals("addi") || opType.equals("subi") || opType.equals("muli") || opType.equals("divi")
-					|| opType.equals("andi") || opType.equals("ori") || opType.equals("xori") || opType.equals("slti")
-					|| opType.equals("slli") || opType.equals("srli") || opType.equals("srai") || opType.equals("load");
-			if (op_type.equals(OperationType.beq) || op_type.equals(OperationType.blt)
-					|| op_type.equals(OperationType.bgt) || op_type.equals(OperationType.bne)
-					|| op_type.equals(OperationType.jmp) || op_type.equals(OperationType.end)) {
-				Statistics.setNumberOfBranchTaken(Statistics.getNumberOfBranchTaken() + 2);
-				IF_EnableLatch.setIF_enable(false);
-				IF_OF_Latch.setOF_enable(false);
-				OF_EX_Latch.setEX_enable(false);
+		loopAround(30);
+		if(OF_EX_Latch.isEX_enable() && EX_MA_Latch.isBusy == false) {
+			int offset = 70000;
+			if(OF_EX_Latch.isNop == true) {
+				EX_MA_Latch.isNop = true;
+				EX_MA_Latch.rd = 75000;
 			}
+			else {
+				EX_MA_Latch.isNop = false;
+				int aluResult = 70000;
+				int rs1 = OF_EX_Latch.rs1;
+				int rs2 = OF_EX_Latch.rs2;
+				int rd = OF_EX_Latch.rd;
+				int imm = OF_EX_Latch.imm;
+				switch(OF_EX_Latch.opcode) {
+					case "00000": {
+						aluResult = rs1 + rs2;
+						break;
+					}
+					case "00001": {
+						aluResult = rs1 + imm;
+						break;
+					}
+					case "00010": {
+						aluResult = rs1 - rs2;
+						break;
+					}
+					case "00011": {
+						aluResult = rs1 - imm;
+						break;
+					}
+					case "00100": {
+						aluResult = rs1 * rs2;
+						break;
+					}
+					case "00101": {
+						aluResult = rs1 * imm;
+						break;
+					}
+					case "00110": {
+						aluResult = rs1 / rs2;
+						int temp = rs1 % rs2;
+						containingProcessor.getRegisterFile().setValue(31, temp);
+						break;
+					}
+					case "00111": {
+						aluResult = rs1 / imm;
+						int temp = rs1 % imm;
+						containingProcessor.getRegisterFile().setValue(31, temp);
+						break;
+					}
 
-			int alu_result = 0;
+					case "01000": {
+						aluResult = rs1 & rs2;
+						break;
+					}
+					case "01001": {
+						aluResult = rs1 & imm;
+						break;
+					}
+					case "01010": {
+						aluResult = rs1 | rs2;
+						break;
+					}
+					case "01011": {
+						aluResult = rs1 | imm;
+						break;
+					}
+					case "01100": {
+						aluResult = rs1 ^ rs2;
+						break;
+					}
+					case "01101": {
+						aluResult = rs1 ^ imm;
+						break;
+					}
 
-			if (opType.equals("add") || opType.equals("sub") || opType.equals("mul") || opType.equals("div")
-					|| opType.equals("and") || opType.equals("or") || opType.equals("xor") || opType.equals("slt")
-					|| opType.equals("sll") || opType.equals("srl") || opType.equals("sra")) {
-				int op1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
-				int op2 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand2().getValue());
-				Simulator.getEventQueue().addEvent(new ExecutionCompleteEvent(Clock.getCurrentTime() + Configuration.ALU_latency, this, this));
-                    OF_EX_Latch.setEX_busy(true);
-                    EX_MA_Latch.setMA_enable(false);
-				switch (op_type) {
-					case add:
-						alu_result = op1 + op2;
+					case "01110": {
+						if(rs1 < rs2) aluResult = 1;
+						else aluResult = 0;
 						break;
-					case sub:
-						alu_result = op1 - op2;
-						break;
-					case mul:
-						alu_result = op1 * op2;
-						break;
-					case div:
-						alu_result = op1 / op2;
-						int remainder = op1 % op2;
-						containingProcessor.getRegisterFile().setValue(31, remainder);
-						break;
-					case and:
-						alu_result = op1 & op2;
-						break;
-					case or:
-						alu_result = op1 | op2;
-						break;
-					case xor:
-						alu_result = op1 ^ op2;
-						break;
-					case slt:
-						if (op1 < op2)
-							alu_result = 1;
-						else
-							alu_result = 0;
-						break;
-					case sll:
-						alu_result = op1 << op2;
-						break;
-					case srl:
-						alu_result = op1 >>> op2;
-						break;
-					case sra:
-						alu_result = op1 >> op2;
-						break;
-					default:
-						break;
-				}
-			} else if (b) {
-				int i = instruction.getSourceOperand1().getValue();
-				int op1 = containingProcessor.getRegisterFile().getValue(i);
-				int op2 = instruction.getSourceOperand2().getValue();
+					}
+					case "01111": {
+						if(rs1 < imm) aluResult = 1;
+						else aluResult = 0;
+					}
 
-				switch (op_type) {
-					case addi:
-						alu_result = op1 + op2;
+					case "10000": {
+						aluResult = rs1 << rs2;
+						String q = Integer.toBinaryString(rs1);
+						while(q.length() != 5) q = "0" + q;
+						String x31 = q.substring(5-rs2, 5);
+						containingProcessor.getRegisterFile().setValue(31, Integer.parseInt(x31,2));
 						break;
-					case subi:
-						alu_result = op1 - op2;
-						break;
-					case muli:
-						alu_result = op1 * op2;
-						break;
-					case divi:
-						alu_result = op1 / op2;
-						int remainder = op1 % op2;
-						containingProcessor.getRegisterFile().setValue(31, remainder);
-						break;
-					case andi:
-						alu_result = op1 & op2;
-						break;
-					case ori:
-						alu_result = op1 | op2;
-						break;
-					case xori:
-						alu_result = op1 ^ op2;
-						break;
-					case slti:
-						if (op1 < op2)
-							alu_result = 1;
-						else
-							alu_result = 0;
-						break;
-					case slli:
-						alu_result = op1 << op2;
-						break;
-					case srli:
-						alu_result = op1 >>> op2;
-						break;
-					case srai:
-						alu_result = op1 >> op2;
-						break;
-					case load:
-						alu_result = op1 + op2;
-						break;
-					default:
-						break;
-				}
-			} else if (op_type.equals(OperationType.store)) {
-				int op1 = containingProcessor.getRegisterFile()
-						.getValue(instruction.getDestinationOperand().getValue());
-				int op2 = instruction.getSourceOperand2().getValue();
-				alu_result = op1 + op2;
-			} else if (op_type.equals(OperationType.jmp)) {
-				OperandType optype = instruction.getDestinationOperand().getOperandType();
-				int imm = 0;
-				if (optype == OperandType.Register) {
-					imm = containingProcessor.getRegisterFile()
-							.getValue(instruction.getDestinationOperand().getValue());
-				} else {
-					imm = instruction.getDestinationOperand().getValue();
-				}
-				alu_result = imm + currentPC;
-				EX_IF_Latch.setIS_Enable(true, alu_result);
-			} else if (op_type.equals(OperationType.beq) || op_type.equals(OperationType.bne)
-					|| op_type.equals(OperationType.blt) || op_type.equals(OperationType.bgt)) {
-				int op1 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
-				int op2 = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand2().getValue());
-				int imm = instruction.getDestinationOperand().getValue();
-				switch (op_type) {
-					case beq:
-						if (op1 == op2) {
-							alu_result = imm + currentPC;
-							EX_IF_Latch.setIS_Enable(true, alu_result);
-						}
-						break;
-					case bne:
-						if (op1 != op2) {
-							alu_result = imm + currentPC;
-							EX_IF_Latch.setIS_Enable(true, alu_result);
-						}
+					}
+					case "10001" : {
+						aluResult = rs1 << imm;
+						String q = Integer.toBinaryString(imm);
 
+						while(q.length() != 5) q = "0" + q;
+						String x31 = q.substring(5-imm, 5);
+						containingProcessor.getRegisterFile().setValue(31, Integer.parseInt(x31,2));
 						break;
-					case blt:
-						if (op1 < op2) {
-							alu_result = imm + currentPC;
-							EX_IF_Latch.setIS_Enable(true, alu_result);
-						}
+					}
+					case "10010" : {
+						aluResult = rs1 >>> rs2;
+						String q = Integer.toBinaryString(rs1);
+
+						while(q.length() != 5) q = "0" + q;
+						String x31 = q.substring(0, rs2);
+						containingProcessor.getRegisterFile().setValue(31, Integer.parseInt(x31,2));
 						break;
-					case bgt:
-						if (op1 > op2) {
-							alu_result = imm + currentPC;
-							EX_IF_Latch.setIS_Enable(true, alu_result);
-						}
+					}
+					case "10011" : {
+						aluResult = rs1 >>> imm;
+						String q = Integer.toBinaryString(imm);
+
+						while(q.length() != 5) q = "0" + q;
+						String x31 = q.substring(0, imm);
+						containingProcessor.getRegisterFile().setValue(31, Integer.parseInt(x31,2));
 						break;
-					default:
+					}
+					case "10100" : {
+						aluResult = rs1 >> rs2;
+						String q = Integer.toBinaryString(rs1);
+
+						while(q.length() != 5) q = "0" + q;
+						String x31 = q.substring(0, rs2);
+						containingProcessor.getRegisterFile().setValue(31, Integer.parseInt(x31,2));
 						break;
+					}
+					case "10101" : {
+						aluResult = rs1 >> imm;
+						String q = Integer.toBinaryString(imm);
+						
+						while(q.length() != 5) q = "0" + q;
+						String x31 = q.substring(0, imm);
+						containingProcessor.getRegisterFile().setValue(31, Integer.parseInt(x31,2));
+						break;
+					}
+
+					case "10110"  : {
+						aluResult = rs1 + imm;
+						break;
+					}
+					case "10111" : {
+						aluResult = containingProcessor.getRegisterFile().getValue(rd) + imm;
+						break;
+					}
+
+					case "11000" : {
+						offset = containingProcessor.getRegisterFile().getValue(rd) + imm;
+						break;
+					}
+					case "11001" : {
+						if(rs1 == containingProcessor.getRegisterFile().getValue(rd)) offset = imm;
+						break;
+					}
+					case "11010" : {
+						if(rs1 != containingProcessor.getRegisterFile().getValue(rd)) offset = imm;
+						break;
+					}
+					case "11011" : {
+						if(rs1 < containingProcessor.getRegisterFile().getValue(rd)) offset = imm;
+						break;
+					}
+					case "11100" : {
+						if(rs1 > containingProcessor.getRegisterFile().getValue(rd)) offset = imm;
+						break;
+					}
+					default : break;
 				}
+				if(offset != 70000) {
+					EX_IF_Latch.isBranchTaken = true;
+					EX_IF_Latch.offset = offset - 1;
+					IF_EnableLatch.setIF_enable(true);
+					OF_EX_Latch.setEX_enable(false);
+					IF_OF_Latch.setOF_enable(false);
+					// IF_OF_Latch.instruction = 0;
+					OF_EX_Latch.imm = 0;
+					OF_EX_Latch.rd = 0;
+					OF_EX_Latch.rs1 = 0;
+					OF_EX_Latch.rs2 = 0;
+				}
+				EX_MA_Latch.aluResult = aluResult;
+				EX_MA_Latch.rs1 = rs1;
+				EX_MA_Latch.rs2 = rs2;
+				EX_MA_Latch.rd = rd;
+				EX_MA_Latch.imm = imm;
+				EX_MA_Latch.opcode = OF_EX_Latch.opcode;
+				System.out.println("EX\t" + OF_EX_Latch.insPC + "\t" + Integer.parseInt(OF_EX_Latch.opcode,2) + "\trs1:" + rs1 + "\trs2:" + rs2 + "\trd:" + rd + "\timm:" + imm + "\talu:" + aluResult) ;//+ " " + rs1 + "\t" + rs2 + "\t" + rd + "\t" + imm);
+				EX_MA_Latch.insPC = OF_EX_Latch.insPC;
+
+				if(OF_EX_Latch.opcode.equals("11101") == true ) {
+					OF_EX_Latch.setEX_enable(false);
+				}
+
+				// OF_EX_Latch.setEX_enable(false);
 			}
-			EX_MA_Latch.setALU_result(alu_result);
-
+			OF_EX_Latch.setEX_enable(false);
 			EX_MA_Latch.setMA_enable(true);
+			
 		}
+		//TODO
 	}
 
 }

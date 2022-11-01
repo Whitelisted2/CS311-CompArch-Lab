@@ -1,14 +1,11 @@
 package generic;
 
-import processor.memorysystem.MainMemory;
-import processor.pipeline.InstructionFetch;
-
 public class MemoryReadEvent extends Event {
 
 	int addressToReadFrom;
 	
-	public MemoryReadEvent(long eventTime, InstructionFetch instructionFetch, MainMemory mainMemory, int address) {
-		super(eventTime, EventType.MemoryRead, instructionFetch, mainMemory);
+	public MemoryReadEvent(long eventTime, Element requestingElement, Element processingElement, int address) {
+		super(eventTime, EventType.MemoryRead, requestingElement, processingElement);
 		this.addressToReadFrom = address;
 	}
 
@@ -16,19 +13,15 @@ public class MemoryReadEvent extends Event {
 		return addressToReadFrom;
 	}
 
+	public boolean checkEqual(int address) {
+		return addressToReadFrom == address;
+	}
+
 	public void setAddressToReadFrom(int addressToReadFrom) {
 		this.addressToReadFrom = addressToReadFrom;
 	}
-
-	// ---------------------------------------
-	public boolean checkEqual(int addr) {
-		if(addr == addressToReadFrom) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+	
 	public String toString() {
-		return "Memory Read event, Set and Get Address";
+		return "Memory read Event, Set address and get address";
 	}
 }

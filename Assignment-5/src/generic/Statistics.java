@@ -10,26 +10,26 @@ public class Statistics {
 	static int numberOfCycles;
 	static int numberOfBranchTaken;
 	static int numberOfRegisterWriteInstructions;
-	static float IPC, CPI;
+	static float IPC;
+	
 
-	public static void printStatistics(String statFile)
-	{
-		try
-		{
+	public static void printStatistics(String statFile)	{
+		try	{
+			// TODO add code here to print statistics in the output file
 			PrintWriter writer = new PrintWriter(statFile);
 			
-			writer.println("Number of instructions executed = " + numberOfInstructions);
-			writer.println("Number of cycles taken = " + numberOfCycles);
+			writer.println("Number of instructions executed: " + numberOfInstructions);
+			writer.println("Number of cycles taken: " + numberOfCycles);
+			writer.println("IPC: " + IPC);
 			
 			writer.close();
 		}
-		catch(Exception e)
-		{
+		catch(Exception e) {
 			Misc.printErrorAndExit(e.getMessage());
 		}
 	}
 	
-	// set instr, cycles
+	// TODO write functions to update statistics
 	public static void setNumberOfInstructions(int numberOfInstructions) {
 		Statistics.numberOfInstructions = numberOfInstructions;
 	}
@@ -38,7 +38,6 @@ public class Statistics {
 		Statistics.numberOfCycles = numberOfCycles;
 	}
 
-	// get instr, cycles
 	public static int getNumberOfInstructions() {
 		return numberOfInstructions;
 	}
@@ -47,7 +46,6 @@ public class Statistics {
 		return numberOfCycles;
 	}
 	
-	// OF instrs
 	public static void setNumberOfOFInstructions(int numberOfOFStageInstructions) {
 		Statistics.numberOfOFStageInstructions = numberOfOFStageInstructions;
 	}
@@ -56,7 +54,6 @@ public class Statistics {
 		return numberOfOFStageInstructions;
 	}
 	
-	// branch taken
 	public static void setNumberOfBranchTaken(int numberOfBranchTaken) {
 		Statistics.numberOfBranchTaken = numberOfBranchTaken;
 	}
@@ -65,7 +62,6 @@ public class Statistics {
 		return numberOfBranchTaken;
 	}
 	
-	// rw instrs
 	public static void setnumberOfRegisterWriteInstructions(int numberOfRegisterWriteInstructions) {
 		Statistics.numberOfRegisterWriteInstructions = numberOfRegisterWriteInstructions;
 	}
@@ -73,10 +69,8 @@ public class Statistics {
 	public static int getNumberOfRegisterWriteInstructions() {
 		return numberOfRegisterWriteInstructions;
 	}
-
-	// IPC, CPI
-	public static void setIPC() {
+	
+	public static void setCPI() {
 		Statistics.IPC = (float)numberOfInstructions/(float)numberOfCycles;
-		Statistics.CPI = (float)numberOfCycles/(float)numberOfInstructions;
 	}
 }

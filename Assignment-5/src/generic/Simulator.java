@@ -1,10 +1,10 @@
 package generic;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+
 
 import processor.Clock;
 import processor.Processor;
@@ -15,28 +15,20 @@ public class Simulator {
 	static boolean simulationComplete;
 	static EventQueue eventQueue;
 	public static long storeresp;
-	public static int inst_count;	
-
-	public static void setupSimulation(String assemblyProgramFile, Processor p)
+	public static int ins_count;
+	
+	public static void setupSimulation(String assemblyProgramFile, Processor p) throws FileNotFoundException
 	{
-		// ----------------------------
 		eventQueue = new EventQueue();
 		storeresp = 0;
-
+		ins_count = 0;
 		Simulator.processor = p;
-		try
-		{
-			loadProgram(assemblyProgramFile);
-		} catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		loadProgram(assemblyProgramFile);
 		
 		simulationComplete = false;
 	}
 	
-	static void loadProgram(String assemblyProgramFile) throws IOException
-	{
+	static void loadProgram(String assemblyProgramFile) throws FileNotFoundException {
 		/*
 		 * TODO
 		 * 1. load the program into memory according to the program layout described
@@ -47,85 +39,66 @@ public class Simulator {
 		 *     x1 = 65535
 		 *     x2 = 65535
 		 */
-		InputStream is = null;
-		try
-		{
-			is = new FileInputStream(assemblyProgramFile);
-		}
-		catch (FileNotFoundException e)
-		{
-			e.printStackTrace();
-		}
-		DataInputStream dis = new DataInputStream(is);
-
+		 
+		DataInputStream dis = new DataInputStream(new BufferedInputStream(new FileInputStream(assemblyProgramFile)));
+		
 		try{
-				
-			int address = 0;
-			int pc = dis.readInt();
-			processor.getRegisterFile().setProgramCounter(pc);
-
-			while(dis.available() > 0)
-			{
-				// int next = dis.readInt();
-				// if(address == -1)
-				// {
-				// 	processor.getRegisterFile().setProgramCounter(next);
-				// }
-				// else
-				// {
-				int value = dis.readInt();
-				processor.getMainMemory().setWord(address, value);
-				// }
-				address += 1;
+			int n = dis.readInt();
+			int i;
+			for(i=0;i<n;i++){
+				int temp = dis.readInt();
+				processor.getMainMemory().setWord(i,temp);
 			}
 			
-			processor.getRegisterFile().setValue(0, 0);
-			processor.getRegisterFile().setValue(1, 65535);
-			processor.getRegisterFile().setValue(2, 65535);
-			
-			//System.out.println(processor.getRegisterFile().getProgramCounter());
-			//String output = processor.getMainMemory().getContentsAsString(0, 15);
-			//System.out.println(output);
+			int pc = i;
+			int offset = 1;
+			processor.getRegisterFile().setProgramCounter(pc);
 
-			dis.close(); 
-		} catch(Exception e){
+			while(dis.available()>0){
+				int temp = dis.readInt();
+				processor.getMainMemory().setWord(i,temp);
+				i += offset;
+			}
+			
+			processor.getRegisterFile().setValue(0,0);
+			processor.getRegisterFile().setValue(1,65535);
+			processor.getRegisterFile().setValue(2,65535);
+
+			dis.close();
+		}
+		catch(Exception e){
 			e.printStackTrace();
 		}
 	}
-
-	public static EventQueue getEventQueue() {
-		return eventQueue;
+	
+	public static EventQueue getEventQueue() { 
+		return eventQueue ; 
 	}
-			
-	public static void simulate()
-	{
-		while(simulationComplete == false)
-		{
+	
+	public static void simulate() {
+		int cycles = 0;
+		
+		while(Simulator.simulationComplete == false) {
 			processor.getRWUnit().performRW();
 			processor.getMAUnit().performMA();
 			processor.getEXUnit().performEX();
-
 			eventQueue.processEvents();
-
 			processor.getOFUnit().performOF();
 			processor.getIFUnit().performIF();
-
 			Clock.incrementClock();
-			// Statistics.setNumberOfInstructions(Statistics.getNumberOfInstructions() + 1);
-			Statistics.setNumberOfCycles(Statistics.getNumberOfCycles() + 1);
+			cycles += 1;
 		}
 		
 		// TODO
 		// set statistics
+		Statistics.setNumberOfCycles(cycles);
+		Statistics.setNumberOfInstructions(ins_count);
+		Statistics.setCPI();
 		
-		//print statistics
-		System.out.println("Number of Cycles: " + Statistics.getNumberOfCycles());
-		System.out.println("Number of OF Stalls: " + (Statistics.getNumberOfInstructions() - Statistics.getNumberOfRegisterWriteInstructions()));
-		System.out.println("Number of Wrong Branch Instructions: " + Statistics.getNumberOfBranchTaken());
 	}
 	
-	public static void setSimulationComplete(boolean value)
-	{
+	public static void setSimulationComplete(boolean value)	{
 		simulationComplete = value;
 	}
+
 }

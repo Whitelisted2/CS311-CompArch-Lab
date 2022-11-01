@@ -1,55 +1,63 @@
 package processor.pipeline;
 
-import generic.Instruction;
 import generic.Simulator;
-import generic.Statistics;
-// import generic.Instruction.OperationType;
 import processor.Processor;
 
 public class RegisterWrite {
 	Processor containingProcessor;
 	MA_RW_LatchType MA_RW_Latch;
 	IF_EnableLatchType IF_EnableLatch;
-
-	public RegisterWrite(Processor containingProcessor, MA_RW_LatchType mA_RW_Latch,
-			IF_EnableLatchType iF_EnableLatch) {
+	
+	public RegisterWrite(Processor containingProcessor, MA_RW_LatchType mA_RW_Latch, IF_EnableLatchType iF_EnableLatch)
+	{
 		this.containingProcessor = containingProcessor;
 		this.MA_RW_Latch = mA_RW_Latch;
 		this.IF_EnableLatch = iF_EnableLatch;
 	}
-
+	
 	public void performRW() {
-		if (MA_RW_Latch.isRW_enable()) {
-			if (MA_RW_Latch.getIsNop()) {
-				MA_RW_Latch.setIsNop(false);
-			} else {
-				Instruction instruction = MA_RW_Latch.getInstruction();
-				String op = instruction.getOperationType().toString();
-				Statistics.setnumberOfRegisterWriteInstructions(Statistics.getNumberOfRegisterWriteInstructions() + 1);
-				// System.out.print(containingProcessor.getRegisterFile().getValue(1));
-				// int aluResult = MA_RW_Latch.getaluResult();
-				if (op.equals("load")) {
-					int ldResult = MA_RW_Latch.getldResult();
-					int rd = instruction.getDestinationOperand().getValue();
-					containingProcessor.getRegisterFile().setValue(rd, ldResult);
-				} else if (op.equals("store") || op.equals("jmp") || op.equals("beq") || op.equals("blt")
-						|| op.equals("bne") || op.equals("bgt")) {
-					// nothing, just get out of this if-else clause
-				} else if (op.equals("end")) {
-					Simulator.setSimulationComplete(true);
-				} else {
-					int aluResult = MA_RW_Latch.getaluResult();
-					int rd = instruction.getDestinationOperand().getValue();
+		if(MA_RW_Latch.isRW_enable()) {
+			// MA_RW_Latch.RW_enable = false;
+			if(MA_RW_Latch.isNop == false) {
+				int aluResult = MA_RW_Latch.aluResult;
+				int rs1 = MA_RW_Latch.rs1;
+				int rs2 = MA_RW_Latch.rs2;
+				int rd = MA_RW_Latch.rd;
+				int imm = MA_RW_Latch.imm;
+				String opcode = MA_RW_Latch.opcode;
+				System.out.println("RW " + MA_RW_Latch.insPC + "\trs1:" + rs1 + "\trs2:" + rs2 + "\trd:" + rd + "\timm:" + imm + "\talu:" + aluResult);
+				if(MA_RW_Latch.isLoad) {
 					containingProcessor.getRegisterFile().setValue(rd, aluResult);
+					MA_RW_Latch.isLoad = false;
 				}
-
-				// if instruction being processed is an end instruction, remember to call
-				// Simulator.setSimulationComplete(true);
-
+				else {
+					if(opcode.equals("11101") == false) {
+						if(opcode.equals("11000") == false) {
+							if(opcode.equals("11001") == false) {
+								if(opcode.equals("11010") == false) {
+									if(opcode.equals("11011") == false) {
+										if(opcode.equals("11100") == false) {
+											containingProcessor.getRegisterFile().setValue(rd, aluResult);
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				
 				MA_RW_Latch.setRW_enable(false);
-				if (!op.equals("end"))
-					IF_EnableLatch.setIF_enable(true);
+				// IF_EnableLatch.setIF_enable(true);
+				if(MA_RW_Latch.opcode.equals("11101")) {
+					Simulator.setSimulationComplete(true);
+					IF_EnableLatch.setIF_enable(false);
+				}
 			}
+			//TODO
+			
+		}
+		else {
+			
 		}
 	}
 

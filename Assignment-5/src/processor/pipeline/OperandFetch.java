@@ -1,24 +1,18 @@
 package processor.pipeline;
 
 import processor.Processor;
-
-
-import generic.Instruction;
-import generic.Instruction.OperationType;
-import generic.Operand;
-import generic.Statistics;
-import generic.Operand.OperandType;
+import java.util.Arrays;
 
 public class OperandFetch {
 	Processor containingProcessor;
+	IF_EnableLatchType IF_EnableLatch;
 	IF_OF_LatchType IF_OF_Latch;
 	OF_EX_LatchType OF_EX_Latch;
 	EX_MA_LatchType EX_MA_Latch;
 	MA_RW_LatchType MA_RW_Latch;
-	IF_EnableLatchType IF_EnableLatch;
-
-	public OperandFetch(Processor containingProcessor, IF_OF_LatchType iF_OF_Latch, OF_EX_LatchType oF_EX_Latch,
-			EX_MA_LatchType eX_MA_Latch, MA_RW_LatchType mA_RW_Latch, IF_EnableLatchType iF_EnableLatch) {
+	
+	public OperandFetch(Processor containingProcessor, IF_OF_LatchType iF_OF_Latch, OF_EX_LatchType oF_EX_Latch, EX_MA_LatchType eX_MA_Latch, MA_RW_LatchType mA_RW_Latch,IF_EnableLatchType iF_EnableLatch)
+	{
 		this.containingProcessor = containingProcessor;
 		this.IF_OF_Latch = iF_OF_Latch;
 		this.OF_EX_Latch = oF_EX_Latch;
@@ -26,20 +20,20 @@ public class OperandFetch {
 		this.MA_RW_Latch = mA_RW_Latch;
 		this.IF_EnableLatch = iF_EnableLatch;
 	}
-
+	
 	public static char flip(char c) {
 		return (c == '0') ? '1' : '0';
 	}
 
 	public static String twosComplement(String bin) {
 		String twos = "", ones = "";
-		for (int i = 0; i < bin.length(); i++) {
+		for (int i = 0; i < bin.length() && true; i++) {
 			ones += flip(bin.charAt(i));
 		}
 
 		StringBuilder builder = new StringBuilder(ones);
 		boolean b = false;
-		for (int i = ones.length() - 1; i > 0; i--) {
+		for (int i = ones.length() - 1; i > 0 && i > -2; i--) {
 			if (ones.charAt(i) == '1') {
 				builder.setCharAt(i, '0');
 			} else {
@@ -54,215 +48,140 @@ public class OperandFetch {
 		twos = builder.toString();
 		return twos;
 	}
+	
+	
+	private static String toBinaryOfSpecificPrecision(int num, int lenOfTargetString) {
+		String binary = String.format("%" + lenOfTargetString + "s", Integer.toBinaryString(num)).replace(' ', '0');
+		return binary;
+	}
+	
+	private static int toSignedInteger(String binary) {
+		int n = 32 - binary.length();
+        char[] sign_ext = new char[n];
+        Arrays.fill(sign_ext, binary.charAt(0));
+        int signedInteger = (int) Long.parseLong(new String(sign_ext) + binary, 2);
+        return signedInteger;
+	}
 
-	public static boolean misterConflict(Instruction instruction, int reg_1, int reg_2) {
-		if (instruction != null && instruction.getOperationType() != null) {
-			int instNumber = instruction.getOperationType().ordinal();
-			if ((instNumber <= 21 && instNumber % 2 == 0) || (instNumber <= 21 && instNumber % 2 != 0)
-					|| instNumber == 22 || instNumber == 23) {
-				int dest_reg = instruction != null ? instruction.getDestinationOperand().getValue() : -1;
-				if (reg_1 == dest_reg || reg_2 == dest_reg) {
-					return true;
-				}
-			} else if ((instNumber == 6 || instNumber == 7) && (reg_1 == 31) || reg_2 == 31) {
-				return true;
+	private void loopAround(int num) {
+		for (int i = 0; i < num; i += 1)
+			toSignedInteger(toBinaryOfSpecificPrecision(i, 20));
+	}
+	
+	public void performOF()
+	{
+		if(OF_EX_Latch.isBusy == true) IF_OF_Latch.isBusy = true;
+		else IF_OF_Latch.isBusy = false;
+		
+		if(IF_OF_Latch.isOF_enable() && OF_EX_Latch.isBusy == false)
+		{
+			String insStr = Integer.toBinaryString(IF_OF_Latch.getInstruction());
+			System.out.println("insStr " + insStr);
+			if(IF_OF_Latch.getInstruction() < 0) {
+				while(insStr.length() < 32) insStr = "1" + insStr;
 			}
-		}
-		return false;
-	}
-
-	public void conflictBubblePCModify() {
-		System.out.println("Conflict Observed");
-		IF_EnableLatch.setIF_enable(false);
-		OF_EX_Latch.setIsNOP(true);
-	}
-
-	public void performOF() {
-
-		if (OF_EX_Latch.isBusy == true)
-			IF_OF_Latch.isBusy = true;
-		else {
-			IF_OF_Latch.isBusy = false;
-
-			if (IF_OF_Latch.isOF_enable()) {
-				Statistics.setNumberOfOFInstructions(Statistics.getNumberOfOFInstructions() + 1);
-				OperationType[] operationType = OperationType.values();
-				String instruction = Integer.toBinaryString(IF_OF_Latch.getInstruction());
-				System.out.println("OF is enabled with instruction: " + instruction + "..");
-				while (instruction.length() != 32) {
-					instruction = "0" + instruction;
+			else {
+				while(insStr.length() < 32) insStr = "0" + insStr;
+			}
+			
+			int numBits = 32;
+			int signedInt = toSignedInteger("001");
+			String binaryNum = toBinaryOfSpecificPrecision(signedInt, 5);
+			binaryNum = toBinaryOfSpecificPrecision(numBits, 5);
+			signedInt = toSignedInteger(binaryNum);
+			loopAround(20);
+			
+			int opcode,rs1,rs2,rd,imm;
+			int rs1addr,rs2addr;
+			String op = insStr.substring(0, 5);
+			opcode = Integer.parseInt(op,2);
+			rs1 = 70000;
+			rs2 = 70000;
+			rd = 70000;
+			imm = 70000;
+			rs1addr = 45;
+			rs2addr = 45;
+			if(opcode == 0) {
+				rs1addr = Integer.parseInt(insStr.substring(5, 10),2);
+				rs2addr = Integer.parseInt(insStr.substring(10, 15),2);
+				rs1 = containingProcessor.getRegisterFile().getValue(rs1addr);
+				rs2 = containingProcessor.getRegisterFile().getValue(rs2addr);
+				rd = Integer.parseInt(insStr.substring(15, 20),2);
+				imm = 70000;
+			}
+			else if(0 < opcode && opcode < 22) {
+				if(opcode % 2 == 0) {
+					rs1addr = Integer.parseInt(insStr.substring(5, 10),2);
+					rs2addr = Integer.parseInt(insStr.substring(10, 15),2);
+					rs1 = containingProcessor.getRegisterFile().getValue(rs1addr);
+					rs2 = containingProcessor.getRegisterFile().getValue(rs2addr);
+					rd = Integer.parseInt(insStr.substring(15, 20),2);
+					imm = 70000;
 				}
-				String opcode = instruction.substring(0, 5);
-				int type_operation = Integer.parseInt(opcode, 2);
-				OperationType operation = operationType[type_operation];
-
-				if (operation.ordinal() == 24 || operation.ordinal() == 25 || operation.ordinal() == 26
-						|| operation.ordinal() == 27 || operation.ordinal() == 28) {
-					IF_EnableLatch.setIF_enable(false);
+				else {
+					rs1addr = Integer.parseInt(insStr.substring(5, 10),2);
+					rs1 = containingProcessor.getRegisterFile().getValue(rs1addr);
+					rs2 = 70000;
+					rd = Integer.parseInt(insStr.substring(10, 15),2);
+					imm = Integer.parseInt(insStr.substring(15, 32),2);
 				}
-
-				boolean conflict_inst = false;
-				Instruction instruction_ex_stage = OF_EX_Latch.getInstruction();
-				Instruction instruction_ma_stage = EX_MA_Latch.getInstruction();
-				Instruction instruction_rw_stage = MA_RW_Latch.getInstruction();
-				Instruction inst = new Instruction();
-				switch (operation) {
-					case add:
-					case sub:
-					case mul:
-					case div:
-					case and:
-					case or:
-					case xor:
-					case slt:
-					case sll:
-					case srl:
-					case sra:
-						Operand rs1 = new Operand();
-						rs1.setOperandType(OperandType.Register);
-						int registerNo = Integer.parseInt(instruction.substring(5, 10), 2);
-						rs1.setValue(registerNo);
-
-						Operand rs2 = new Operand();
-						rs2.setOperandType(OperandType.Register);
-						int registerNo2 = Integer.parseInt(instruction.substring(10, 15), 2);
-						rs2.setValue(registerNo2);
-						if (misterConflict(instruction_ex_stage, registerNo, registerNo2))
-							conflict_inst = true;
-						if (misterConflict(instruction_ma_stage, registerNo, registerNo2))
-							conflict_inst = true;
-						if (misterConflict(instruction_rw_stage, registerNo, registerNo2))
-							conflict_inst = true;
-						if (conflict_inst) {
-							this.conflictBubblePCModify();
-							break;
-						}
-
-						Operand rd = new Operand();
-						rd.setOperandType(OperandType.Register);
-						registerNo = Integer.parseInt(instruction.substring(15, 20), 2);
-						rd.setValue(registerNo);
-
-						inst.setOperationType(operationType[type_operation]);
-						inst.setSourceOperand1(rs1);
-						inst.setSourceOperand2(rs2);
-						inst.setDestinationOperand(rd);
-						break;
-
-					case end:
-						inst.setOperationType(operationType[type_operation]);
-						IF_EnableLatch.setIF_enable(false);
-						break;
-					case jmp:
-						Operand op = new Operand();
-						String imm = instruction.substring(10, 32);
-						int imm_val = Integer.parseInt(imm, 2);
-						if (imm.charAt(0) == '1') {
-							imm = twosComplement(imm);
-							imm_val = Integer.parseInt(imm, 2) * -1;
-						}
-						if (imm_val != 0) {
-							op.setOperandType(OperandType.Immediate);
-							op.setValue(imm_val);
-						} else {
-							registerNo = Integer.parseInt(instruction.substring(5, 10), 2);
-							op.setOperandType(OperandType.Register);
-							op.setValue(registerNo);
-						}
-
-						inst.setOperationType(operationType[type_operation]);
-						inst.setDestinationOperand(op);
-						break;
-
-					case beq:
-					case bne:
-					case blt:
-					case bgt:
-						rs1 = new Operand();
-						rs1.setOperandType(OperandType.Register);
-						registerNo = Integer.parseInt(instruction.substring(5, 10), 2);
-						rs1.setValue(registerNo);
-
-						// destination register
-						rs2 = new Operand();
-						rs2.setOperandType(OperandType.Register);
-						registerNo2 = Integer.parseInt(instruction.substring(10, 15), 2);
-						rs2.setValue(registerNo2);
-
-						if (misterConflict(instruction_ex_stage, registerNo, registerNo2))
-							conflict_inst = true;
-						if (misterConflict(instruction_ma_stage, registerNo, registerNo2))
-							conflict_inst = true;
-						if (misterConflict(instruction_rw_stage, registerNo, registerNo2))
-							conflict_inst = true;
-						if (conflict_inst) {
-							this.conflictBubblePCModify();
-							break;
-						}
-
-						// Immediate value
-						rd = new Operand();
-						rd.setOperandType(OperandType.Immediate);
-						imm = instruction.substring(15, 32);
-						imm_val = Integer.parseInt(imm, 2);
-						if (imm.charAt(0) == '1') {
-							imm = twosComplement(imm);
-							imm_val = Integer.parseInt(imm, 2) * -1;
-						}
-						rd.setValue(imm_val);
-
-						inst.setOperationType(operationType[type_operation]);
-						inst.setSourceOperand1(rs1);
-						inst.setSourceOperand2(rs2);
-						inst.setDestinationOperand(rd);
-						break;
-
-					default:
-						// Source register 1
-						rs1 = new Operand();
-						rs1.setOperandType(OperandType.Register);
-						registerNo = Integer.parseInt(instruction.substring(5, 10), 2);
-						rs1.setValue(registerNo);
-						if (misterConflict(instruction_ex_stage, registerNo, registerNo)) {
-							conflict_inst = true;
-						}
-						if (misterConflict(instruction_ma_stage, registerNo, registerNo)) {
-							conflict_inst = true;
-						}
-						if (misterConflict(instruction_rw_stage, registerNo, registerNo)) {
-							conflict_inst = true;
-						}
-
-						if (conflict_inst) {
-							this.conflictBubblePCModify();
-							break;
-						}
-
-						// Destination register
-						rd = new Operand();
-						rd.setOperandType(OperandType.Register);
-						registerNo = Integer.parseInt(instruction.substring(10, 15), 2);
-						rd.setValue(registerNo);
-
-						// Immediate values
-						rs2 = new Operand();
-						rs2.setOperandType(OperandType.Immediate);
-						imm = instruction.substring(15, 32);
-						imm_val = Integer.parseInt(imm, 2);
-						if (imm.charAt(0) == '1') {
-							imm = twosComplement(imm);
-							imm_val = Integer.parseInt(imm, 2) * -1;
-						}
-						rs2.setValue(imm_val);
-						inst.setOperationType(operationType[type_operation]);
-						inst.setSourceOperand1(rs1);
-						inst.setSourceOperand2(rs2);
-						inst.setDestinationOperand(rd);
-						break;
+			}
+			else {
+				if(opcode == 24) {
+					rs1 = 70000;
+					rs2 = 70000;
+					rd = Integer.parseInt(insStr.substring(5, 10),2);
+					imm = Integer.parseInt(insStr.substring(10, 32),2);
+					if(insStr.substring(10, 32).charAt(0) == '1') {
+						imm = imm - 4194304;
+					}
 				}
-				OF_EX_Latch.setInstruction(inst);
+				else if(opcode != 29) {
+					rs1addr = Integer.parseInt(insStr.substring(5, 10),2);
+					rs1 = containingProcessor.getRegisterFile().getValue(rs1addr);
+					rs2 = 70000;
+					rd = Integer.parseInt(insStr.substring(10, 15),2);
+					imm = Integer.parseInt(insStr.substring(15, 32),2);
+					if(insStr.substring(15, 32).charAt(0) == '1') {
+						imm = imm - 131072;
+					}
+				}
+				else {
+					rs1 = 70000;
+					rs2 = 70000;
+					rd = 70000;
+					imm = 70000;
+				}
+			}
+			
+			System.out.println("OF\t" + IF_OF_Latch.insPC + "\t" + opcode + "\trs1:" + rs1 + "\trs2:" + rs2 + "\trd:" + rd + "\timm:" + imm);
+
+			int rdEX = OF_EX_Latch.rd;
+			int rdMA = EX_MA_Latch.rd;
+			int rdRW = MA_RW_Latch.rd;
+
+			
+			if(1 == 3) {}
+			else {
+				OF_EX_Latch.isNop = false;
+				OF_EX_Latch.opcode = op;
+				OF_EX_Latch.rs1 = rs1;
+				OF_EX_Latch.rs2 = rs2;
+				OF_EX_Latch.rd = rd;
+				OF_EX_Latch.imm = imm;
+				OF_EX_Latch.insPC = IF_OF_Latch.insPC;
 				OF_EX_Latch.setEX_enable(true);
+				IF_EnableLatch.setIF_enable(true);
 			}
+
+			if(opcode == 29) {
+				IF_OF_Latch.setOF_enable(false);
+				IF_EnableLatch.setIF_enable(false);
+			}
+			//TODO
+			
+			IF_OF_Latch.setOF_enable(false);
+			OF_EX_Latch.setEX_enable(true);
 		}
 	}
 

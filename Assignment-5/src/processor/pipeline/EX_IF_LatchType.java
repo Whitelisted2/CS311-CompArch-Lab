@@ -1,35 +1,44 @@
 package processor.pipeline;
 
 public class EX_IF_LatchType {
-
+	
+	boolean isBranchTaken;
+	int offset;
 	boolean IS_enable;
 	int PC;
-	int offset;
 	
-	public EX_IF_LatchType()
-	{
-		IS_enable = false;
-		offset = 999999;
+	public EX_IF_LatchType() {
+		isBranchTaken = false;
+		offset = 70000;
 	}
 
-	public boolean getIS_Enable() {
+	public void setOffset(int offset) {
+		this.offset = offset;
+	}
+
+	public boolean getIsBranchTaken() {
+		return isBranchTaken;
+	}
+
+	public void setPc(int pc) {
+		this.PC = pc;
+	}
+	
+	public boolean getIS_enable() {
 		return IS_enable;
 	}
 
-	public void setIS_Enable(boolean iS_enable, int newPC) {
+	public void setIS_enable(boolean iS_enable) {
 		IS_enable = iS_enable;
-		PC = newPC;
 	}
 
-	public void setIS_Enable(boolean iS_enable) {
+	public void setIS_enable(boolean iS_enable, int newPC) {
 		IS_enable = iS_enable;
+		PC = newPC;
 	}
 
 	public int getPC() {
 		return PC;
 	}
 
-	public void setPC(int pC) {
-		this.PC = pC;
-	}
 }

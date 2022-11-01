@@ -9,8 +9,7 @@ public class Event {
 	Element processingElement;
 	EventType eventType;
 	
-	public Event(long eventTime, EventType eventType, Element requestingElement, Element processingElement)
-	{
+	public Event(long eventTime, EventType eventType, Element requestingElement, Element processingElement) {
 		this.eventTime = eventTime;
 		this.eventType = eventType;
 		this.requestingElement = requestingElement;
@@ -25,12 +24,26 @@ public class Event {
 		this.eventTime = eventTime;
 	}
 
+	public long checkParity() {
+		return eventTime % 2;
+	}
+
+	public void setEventAndRequest(long eventTime, Element requestingElement) {
+		this.eventTime = eventTime;
+		this.requestingElement = requestingElement;
+	}
+
 	public Element getRequestingElement() {
 		return requestingElement;
 	}
 
 	public void setRequestingElement(Element requestingElement) {
 		this.requestingElement = requestingElement;
+	}
+
+	public void setRequestAndProcess(Element requestingElement, Element processingElement) {
+		this.requestingElement = requestingElement;
+		this.processingElement = processingElement;
 	}
 
 	public Element getProcessingElement() {
@@ -41,6 +54,11 @@ public class Event {
 		this.processingElement = processingElement;
 	}
 
+	public void setProcessAndType(Element processingElement, EventType eventType) {
+		this.processingElement = processingElement;
+		this.eventType = eventType;
+	}
+
 	public EventType getEventType() {
 		return eventType;
 	}
@@ -48,18 +66,8 @@ public class Event {
 	public void setEventType(EventType eventType) {
 		this.eventType = eventType;
 	}
-	// --------------------------------------
-	// time parity
-
-	public void setEventAndRequest(long EventTime, Element RequestingElement){ //
-		this.eventTime = EventTime;
-		this.requestingElement = RequestingElement;
-	}
-	public void setProcessAndEventType(Element ProcessingElement, EventType eVentType){ //
-		this.processingElement = ProcessingElement;
-		this.eventType = eVentType;
-	}
+	
 	public String toString() {
-		return "Set Event";
+		return "Set Event ";
 	}
 }

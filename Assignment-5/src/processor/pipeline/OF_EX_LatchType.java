@@ -1,25 +1,36 @@
 package processor.pipeline;
 
-import generic.Instruction;
-
 public class OF_EX_LatchType {
 	
 	boolean EX_enable;
-	Instruction instruction;
-	boolean NOP;
+	String opcode;
+	int rs1,rs2,rd,imm;
+	int rs1addr,rs2addr;
+	int insPC;
+	boolean isNop;
 	boolean isBusy;
-
-	boolean isNOP;
-	int instPC;
-
-	public OF_EX_LatchType()
-	{
+	boolean NOP;
+	
+	public OF_EX_LatchType() {
 		EX_enable = false;
-		NOP = false;
-
-		isNOP = false;
+		opcode = "70000";
+		rs1 = 70000;
+		rs2 = 70000;
+		rd = 70000;
+		imm = 70000;
+		insPC = -1;
+		isNop = false;
+		rs1addr = 45;
+		rs2addr = 45;
 		isBusy = false;
+	}
 
+	public String toString() {
+		return "OF_EX_LatchType";
+	}
+
+	public boolean comparePC (int pc) {
+		return insPC == pc;
 	}
 
 	public boolean isEX_enable() {
@@ -29,14 +40,6 @@ public class OF_EX_LatchType {
 	public void setEX_enable(boolean eX_enable) {
 		EX_enable = eX_enable;
 	}
-
-	public void setInstruction(Instruction instruction) {
-		this.instruction = instruction;
-	}
-
-	public Instruction getInstruction() {
-		return this.instruction;
-	}
 	
 	public boolean getIsNOP() {
 		return NOP;
@@ -45,13 +48,4 @@ public class OF_EX_LatchType {
 	public void setIsNOP(boolean is_NOP) {
 		NOP = is_NOP;
 	}
-
-	public boolean checkPC (int pc) {
-		return instPC == pc;
-	}
-
-	public String toString() {
-		return "OF_EX_LatchType";
-	}
-
 }

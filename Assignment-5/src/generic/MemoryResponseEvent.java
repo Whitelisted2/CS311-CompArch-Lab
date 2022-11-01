@@ -17,17 +17,11 @@ public class MemoryResponseEvent extends Event {
 		this.value = value;
 	}
 
-	// ---------------------------------------
-	public boolean checkEqual(int Value) {
-		if(this.value == Value) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+	public boolean checkEquality(int value) {
+		return this.value == value;
+	} 
 
 	public String toString() {
-		return "Memory Response event, Set and Get Value";
+		return "Memory response event, Set and get value";
 	}
-
 }

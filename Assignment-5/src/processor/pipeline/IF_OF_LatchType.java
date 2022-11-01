@@ -4,23 +4,21 @@ public class IF_OF_LatchType {
 	
 	boolean OF_enable;
 	int instruction;
+	int insPC;
 	boolean isBusy;
-	int instPC;
-
-	public IF_OF_LatchType()
-	{
+	
+	public IF_OF_LatchType() {
 		OF_enable = false;
+		insPC = -1;
+		instruction = -1999;
 		isBusy = false;
-		instPC = -1;
-		instruction = -1999;
 	}
-
-	public IF_OF_LatchType(boolean oF_enable, boolean IsBusy)
-	{
+	
+	public IF_OF_LatchType(boolean oF_enable, boolean isBusy) {
 		OF_enable = oF_enable;
-		isBusy = IsBusy;
-		instPC = -1;
+		insPC = -1;
 		instruction = -1999;
+		this.isBusy = isBusy;
 	}
 
 	public boolean isOF_enable() {
@@ -31,6 +29,14 @@ public class IF_OF_LatchType {
 		OF_enable = oF_enable;
 	}
 
+	public boolean checkInstruction(int instruction) {
+		return this.instruction == instruction;
+	}
+
+	public boolean checkPC(int pc) {
+		return insPC == pc;
+	}
+
 	public int getInstruction() {
 		return instruction;
 	}
@@ -39,15 +45,4 @@ public class IF_OF_LatchType {
 		this.instruction = instruction;
 	}
 
-	public boolean checkInst(int instruction) {
-		return this.instruction == instruction;
-	}
-
-	public boolean checkPC(int pc) {
-		return instPC == pc;
-	}
-
-	public String toString() {
-		return "IF_OF_LatchType";
-	}
 }
