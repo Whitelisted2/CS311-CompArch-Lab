@@ -19,9 +19,9 @@
 	</FunctionalUnits>
 	
 	<L1iCache>
-		<NumberOfLines>1024</NumberOfLines>
-		<Latency>8</Latency>
-		<Associativity>4</Associativity>
+		<NumberOfLines>4</NumberOfLines>
+		<Latency>1</Latency>
+		<Associativity>2</Associativity>
 		<ReplacementPolicy>LRU</ReplacementPolicy>
 	</L1iCache>
 	
