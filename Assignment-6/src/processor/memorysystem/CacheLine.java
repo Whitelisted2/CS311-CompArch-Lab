@@ -1,8 +1,5 @@
 package processor.memorysystem;
 
-import generic.*;
-import processor.*;
-
 public class CacheLine{
     int[] tag = new int[2]; 
     int[] data = new int[2];
@@ -38,20 +35,17 @@ public class CacheLine{
     }
 
     public void setData(int tag, int d) {
-        switch(tag){
-            case this.tag[0]:
-                this.data[0] = d;
-                this.LRUctr = 1;
-                break;
-            case this.tag[1]:
-                this.data[1] = d;
-                this.LRUctr = 0;
-                break;
-            default:
-                int l = this.LRUctr;
-                this.tag[l] = tag;
-                this.data[l] = d;
-                this.LRUctr = 1 - this.LRUctr;
+        if(tag == this.tag[0]){
+            this.data[0] = d;
+            this.LRUctr = 1;
+        } else if(tag == this.tag[1]){
+            this.data[0] = d;
+            this.LRUctr = 0;
+        } else{
+            int l = this.LRUctr;
+            this.tag[l] = tag;
+            this.data[l] = d;
+            this.LRUctr = 1 - this.LRUctr;
         }
 	}
 

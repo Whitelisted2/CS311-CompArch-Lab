@@ -4,7 +4,7 @@ import java.io.PrintWriter;
 
 public class Statistics {
 
-    // TODO add your statistics here
+    // todo add your statistics here
     static int numberOfInstructions;
     static int numberOfCycles;
     private static int freezednumberOfInstructions;
@@ -21,7 +21,7 @@ public class Statistics {
             writer.println("CPI = " + CPI);
             writer.println("IPC = " + IPC);
 
-            // TODO add code here to print statistics in the output file
+            // todo add code here to print statistics in the output file
 
             writer.close();
         } catch (Exception e) {
@@ -33,7 +33,7 @@ public class Statistics {
         return Statistics.numberOfInstructions;
     }
 
-    // TODO write functions to update statistics
+    // todo write functions to update statistics
     public static void setNumberOfInstructions(int numberOfInstructions) {
         Statistics.numberOfInstructions = numberOfInstructions;
     }

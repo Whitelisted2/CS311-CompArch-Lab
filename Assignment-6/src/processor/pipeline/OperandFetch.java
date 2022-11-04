@@ -258,7 +258,7 @@ public class OperandFetch {
             nop.setOperationType(OperationType.nop);
             boolean notConflict = false;
             //int tk=0;
-            int freeze = 0;
+            //int freeze = 0;
             while (true) {
                 if (EX_MA_Latch.getFlag() == 1) {
                     OF_EX_Latch.setInstruction(nop);
@@ -305,5 +305,4 @@ public class OperandFetch {
             }
         }
     }
-
 }

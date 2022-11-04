@@ -1,14 +1,14 @@
 package processor;
 
-import processor.memorysystem.MainMemory;
+import processor.memorysystem.*;
 import processor.pipeline.*;
 
 public class Processor {
-
     int stalls;
-    int wrong_input;
+    int wrongInput;
     int freezed_stalls;
-    int freezed_wrong_input;
+    int freezed_wrongInput;
+
     RegisterFile registerFile;
     MainMemory mainMemory;
 
@@ -18,6 +18,8 @@ public class Processor {
     EX_MA_LatchType EX_MA_Latch;
     EX_IF_LatchType EX_IF_Latch;
     MA_RW_LatchType MA_RW_Latch;
+    Cache instCache;
+    Cache dataCache; 
 
     InstructionFetch IFUnit;
     OperandFetch OFUnit;
@@ -26,8 +28,9 @@ public class Processor {
     RegisterWrite RWUnit;
 
     public Processor() {
+
         stalls = 0;
-        wrong_input = 0;
+        wrongInput = 0;
         registerFile = new RegisterFile();
         mainMemory = new MainMemory();
 
@@ -38,11 +41,44 @@ public class Processor {
         EX_IF_Latch = new EX_IF_LatchType();
         MA_RW_Latch = new MA_RW_LatchType();
 
-        IFUnit = new InstructionFetch(this, IF_EnableLatch, IF_OF_Latch, EX_IF_Latch);
+        // size     16,  128,  512, 1024
+        // latency   1,    2,    3,    4
+
+        int instCacheSize = 16;
+        int dataCacheSize = 16;
+        
+        int instCacheLatency = getLat(instCacheSize);
+        int dataCacheLatency = getLat(dataCacheSize);
+        
+        instCache = new Cache(this, instCacheLatency, instCacheSize);
+        dataCache = new Cache(this, dataCacheLatency, dataCacheSize);
+        IFUnit = new InstructionFetch(this, IF_EnableLatch, IF_OF_Latch, EX_IF_Latch, instCache);
         OFUnit = new OperandFetch(this, IF_OF_Latch, OF_EX_Latch, EX_MA_Latch, MA_RW_Latch, IF_EnableLatch);
         EXUnit = new Execute(this, OF_EX_Latch, EX_MA_Latch, EX_IF_Latch, IF_OF_Latch, MA_RW_Latch);
-        MAUnit = new MemoryAccess(this, EX_MA_Latch, MA_RW_Latch, IF_OF_Latch, OF_EX_Latch);
+        MAUnit = new MemoryAccess(this, EX_MA_Latch, MA_RW_Latch, IF_OF_Latch, OF_EX_Latch, dataCache);
         RWUnit = new RegisterWrite(this, MA_RW_Latch, IF_EnableLatch, IF_OF_Latch, OF_EX_Latch, EX_MA_Latch);
+    }
+
+    public int getLat(int cacheSize){
+        int latency;
+        switch(cacheSize){
+            case 16:
+                latency = 1;
+                break;
+            case 128:
+                latency = 2;
+                break;
+            case 512:
+                latency = 3;
+                break;
+            case 1024:
+                latency = 4;
+                break;
+            default:
+                System.out.println("cache size to latency mapping not defined to this!");
+                latency = 1;
+        }
+        return latency;
     }
 
     public void printState(int memoryStartingAddress, int memoryEndingAddress) {
@@ -60,11 +96,11 @@ public class Processor {
     }
 
     public int getFreezed_wrong_input() {
-        return freezed_wrong_input;
+        return freezed_wrongInput;
     }
 
-    public void setFreezed_wrong_input(int freezed_wrong_input) {
-        this.freezed_wrong_input = freezed_wrong_input;
+    public void setFreezed_wrong_input(int Freezed_wrongInput) {
+        this.freezed_wrongInput = Freezed_wrongInput;
     }
 
     public RegisterFile getRegisterFile() {
@@ -92,11 +128,11 @@ public class Processor {
     }
 
     public int getWrong_input() {
-        return wrong_input;
+        return wrongInput;
     }
 
-    public void setWrong_input(int wrong_input) {
-        this.wrong_input = wrong_input;
+    public void setWrong_input(int WrongInput) {
+        this.wrongInput = WrongInput;
     }
 
     public InstructionFetch getIFUnit() {
