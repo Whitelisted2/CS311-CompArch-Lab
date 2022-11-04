@@ -42,7 +42,6 @@ public class MemoryAccess implements Element{
 
                     OperationType Operation_Type = instruction.getOperationType();
                     if (Operation_Type.toString().equals("store")) {
-                        //System.out.println(instruction);
                         int SOP = containingProcessor.getRegisterFile().getValue(instruction.getSourceOperand1().getValue());
                         //containingProcessor.getMainMemory().setWord(ALU_output, res_st);
                         //System.out.println("Value to Store "+(SOP));
@@ -59,11 +58,6 @@ public class MemoryAccess implements Element{
                         EX_MA_Latch.setMA_enable(false);
                         //return;
                     } else if (Operation_Type.toString().equals("load")) {
-                        //System.out.println(instruction);
-                        //System.out.println(MA_RW_Latch.getInstruction());
-                        //int res_ld = containingProcessor.getMainMemory().getWord(ALU_output);
-                        //MA_RW_Latch.setLoad_Output(res_ld);
-                        //MA_RW_Latch.isLoad = true;
                         EX_MA_Latch.setMA_busy(true);
                         Simulator.getEventQueue().addEvent(
                                 new MemoryReadEvent(
@@ -75,11 +69,8 @@ public class MemoryAccess implements Element{
                         //return;
                     }
                     MA_RW_Latch.setInstruction(instruction);
-                    //MA_RW_Latch.setRW_enable(true);
-                    //EX_MA_Latch.setMA_enable(false);
                 }
                 else {
-                    //System.out.println("bubble");
                 }
             }
             EX_MA_Latch.setMA_enable(false);
@@ -103,8 +94,6 @@ public class MemoryAccess implements Element{
             EX_MA_Latch.setMA_busy(false);
         }
 
-        // IF_OF_Latch.setOF_enable(true);
-        // IF_EnableLatch.isBusy = false;
     }
 
 }
