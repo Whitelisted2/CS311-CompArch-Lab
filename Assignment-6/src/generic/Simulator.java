@@ -29,7 +29,7 @@ public class Simulator {
 
     static void loadProgram(String assemblyProgramFile) {
         //
-        // todo
+        // TODO
         // 1. load the program into memory according to the program layout described
         //    in the ISA specification
         try (
@@ -79,7 +79,7 @@ public class Simulator {
 
     public static void simulate() {
         int cycles = 0;
-        while (!simulationComplete) {
+        while (!Simulator.simulationComplete) {
             processor.getRWUnit().performRW();
             processor.getMAUnit().performMA();
             processor.getEXUnit().performEX();
@@ -93,12 +93,12 @@ public class Simulator {
         }
         //System.out.println("Cycles Taken:         " + Clock.getCurrentTime());
         //System.out.println("Instruction Executed: " + (ins_count));
-        // todo
+        // TODO
         // set statistics
         //Statistics.setNumberOfCycles((int) Clock.getCurrentTime());
         Statistics stat = new Statistics();
-        Statistics.setNumberOfCycles(cycles);
-        Statistics.setNumberOfInstructions(ins_count);
+        stat.setNumberOfCycles(cycles);
+        stat.setNumberOfInstructions(ins_count);
         stat.setCPI();
         stat.setIPC();
     }

@@ -2,14 +2,24 @@ package processor.pipeline;
 
 public class IF_OF_LatchType {
 
+    int insPC;
     boolean OF_enable;
     int instruction;
     boolean OF_busy;
 
     public IF_OF_LatchType() {
-        OF_enable = true;
-        instruction = -1;
+        OF_enable = false;
+        instruction = -1999;
         OF_busy = false;
+        insPC = -1;
+    }
+
+    public int getInsPC() {
+        return insPC;
+    }
+
+    public void setInsPC(int insPC) {
+        this.insPC = insPC;
     }
 
     public boolean isOF_busy() {

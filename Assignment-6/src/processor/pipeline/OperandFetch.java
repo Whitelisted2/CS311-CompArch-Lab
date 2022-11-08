@@ -4,7 +4,6 @@ import generic.Instruction;
 import generic.Instruction.OperationType;
 import generic.Operand;
 import generic.Operand.OperandType;
-import generic.Statistics;
 import processor.Processor;
 
 import java.util.stream.Collectors;
@@ -61,54 +60,17 @@ public class OperandFetch {
         return twos;
     }
 
-    public boolean CheckConflict(Instruction inst, Instruction toCheck) {
-        if (toCheck != null &&
-                !toCheck.getOperationType().toString().equals("nop")
-                && !toCheck.getOperationType().toString().equals("end")
-                && !inst.getOperationType().toString().equals("nop")
-                && !inst.getOperationType().toString().equals("end")
-                && !inst.getOperationType().toString().equals("jmp")
-                && toCheck.getDestinationOperand() != null
-                && (toCheck.getDestinationOperand().getValue() == inst.getSourceOperand1().getValue() ||
-                toCheck.getDestinationOperand().getValue() == inst.getSourceOperand2().getValue())) {
-            ///System.out.println("!!!");
-            return true;
-        } else if (toCheck != null &&
-                !toCheck.getOperationType().toString().equals("nop")
-                && !toCheck.getOperationType().toString().equals("end")
-                && !inst.getOperationType().toString().equals("nop")
-                && !inst.getOperationType().toString().equals("end")
-                && !inst.getOperationType().toString().equals("jmp")
-                && toCheck.getDestinationOperand() != null
-                && (toCheck.getDestinationOperand().getValue() == inst.getSourceOperand1().getValue() ||
-                toCheck.getDestinationOperand().getValue() == inst.getSourceOperand2().getValue()) &&
-                (inst.getOperationType().toString().equals("beq") ||
-                        inst.getOperationType().toString().equals("bne") ||
-                        inst.getOperationType().toString().equals("blt") ||
-                        inst.getOperationType().toString().equals("bgt"))
-        ) {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
     public void performOF() {
-        //System.out.println("YessO");
-        //System.out.println(OF_EX_Latch.isEX_busy());
-        if (EX_MA_Latch.isMA_busy()) {
-            return;
-        }
-        if (OF_EX_Latch.isEX_busy()) {
-            return;
-        } else if (IF_OF_Latch.isOF_enable()) {
+        if(OF_EX_Latch.isEX_busy()) IF_OF_Latch.setOF_busy(true);
+        else IF_OF_Latch.setOF_busy(false);
+        // if(IF_OF_Latch.isOF_enable() == false) OF_EX_Latch.EX_enable = false;
+        if(IF_OF_Latch.isOF_enable() && !OF_EX_Latch.isEX_busy())
+        {
             int inst = IF_OF_Latch.getInstruction();
-            if (inst == -1) {
-                return;
-            }
+            //System.out.println(inst);
             OperationType[] operationType = OperationType.values();
             String instb = Integer.toBinaryString(inst);
+            //System.out.println(instb);
             if (instb.length() != 32) {
                 int limm = instb.length();
                 String lRepeated = "";
@@ -120,26 +82,31 @@ public class OperandFetch {
                 instb = lRepeated + instb;
             }
             String opcode = instb.substring(0, 5);
+            //System.out.println(opcode);
             int opcodei = Integer.parseInt(opcode, 2);
+            //System.out.println(opcodei);
             OperationType operation = operationType[opcodei];
-            Instruction forwardInstruction = new Instruction();
+            //System.out.println(operation);
+            Instruction instn = new Instruction();
             Operand rs1;
             int reg_no;
             Operand rs2;
             Operand rd;
             String cons;
             int cons_val;
-            if (operation.toString().equals("add")
-                    || operation.toString().equals("sub")
-                    || operation.toString().equals("mul")
-                    || operation.toString().equals("div")
-                    || operation.toString().equals("and")
-                    || operation.toString().equals("or")
-                    || operation.toString().equals("xor")
-                    || operation.toString().equals("slt")
-                    || operation.toString().equals("sll")
-                    || operation.toString().equals("srl")
-                    || operation.toString().equals("sra")) {
+			switch(operation){
+
+				case add:
+				case sub:
+				case mul:
+				case div:
+				case and:
+				case or:
+				case xor:
+				case slt:
+				case sll:
+				case srl:
+				case sra:
                 rs1 = new Operand();
                 rs1.setOperandType(OperandType.Register);
                 reg_no = Integer.parseInt(instb.substring(5, 10), 2);
@@ -155,13 +122,15 @@ public class OperandFetch {
                 reg_no = Integer.parseInt(instb.substring(15, 20), 2);
                 rd.setValue(reg_no);
 
-                forwardInstruction.setOperationType(operationType[opcodei]);
-                forwardInstruction.setSourceOperand1(rs1);
-                forwardInstruction.setSourceOperand2(rs2);
-                forwardInstruction.setDestinationOperand(rd);
-            } else if (operation.toString().equals("end")) {
-                forwardInstruction.setOperationType(operationType[opcodei]);
-            } else if (operation.toString().equals("jmp")) {
+                instn.setOperationType(operationType[opcodei]);
+                instn.setSourceOperand1(rs1);
+                instn.setSourceOperand2(rs2);
+                instn.setDestinationOperand(rd);
+                break;
+                case end:
+                instn.setOperationType(operationType[opcodei]);
+                break;
+            case jmp:
                 Operand op = new Operand();
                 cons = instb.substring(10, 32);
                 cons_val = Integer.parseInt(cons, 2);
@@ -178,23 +147,25 @@ public class OperandFetch {
                     op.setValue(reg_no);
                 }
 
-                forwardInstruction.setOperationType(operationType[opcodei]);
-                forwardInstruction.setDestinationOperand(op);
-                OperandType OPERNDTYPE = forwardInstruction.getDestinationOperand().getOperandType();
-                int immediate = 0;
-                if (OPERNDTYPE == OperandType.Register) {
-                    immediate = containingProcessor.getRegisterFile().getValue(
-                            forwardInstruction.getDestinationOperand().getValue());
-                } else {
-                    immediate = forwardInstruction.getDestinationOperand().getValue();
-                }
-                int cPC = containingProcessor.getRegisterFile().programCounter - 1;
-                int output = immediate + cPC;
-                containingProcessor.getRegisterFile().setProgramCounter(output);
-            } else if (operation.toString().equals("beq")
-                    || operation.toString().equals("bne")
-                    || operation.toString().equals("blt")
-                    || operation.toString().equals("bgt")) {
+                instn.setOperationType(operationType[opcodei]);
+                instn.setDestinationOperand(op);
+                //OperandType OPERNDTYPE = instn.getDestinationOperand().getOperandType();
+                //int immediate = 0;
+                //if (OPERNDTYPE == OperandType.Register) {
+                  //  immediate = containingProcessor.getRegisterFile().getValue(
+                  //          instn.getDestinationOperand().getValue());
+                //} else {
+                  //  immediate = instn.getDestinationOperand().getValue();
+                //}
+                //int cPC = containingProcessor.getRegisterFile().programCounter - 1;
+                //int output = immediate + cPC;
+                //containingProcessor.getRegisterFile().setProgramCounter(output);
+                    break;
+               case beq:
+               case bne:
+               case blt:
+               case bgt:
+               case store:
                 rs1 = new Operand();
                 rs1.setOperandType(OperandType.Register);
                 reg_no = Integer.parseInt(instb.substring(5, 10), 2);
@@ -217,11 +188,23 @@ public class OperandFetch {
                 }
                 rd.setValue(cons_val);
 
-                forwardInstruction.setOperationType(operationType[opcodei]);
-                forwardInstruction.setSourceOperand1(rs1);
-                forwardInstruction.setSourceOperand2(rs2);
-                forwardInstruction.setDestinationOperand(rd);
-            } else {
+                instn.setOperationType(operationType[opcodei]);
+                instn.setSourceOperand1(rs1);
+                instn.setSourceOperand2(rs2);
+                instn.setDestinationOperand(rd);
+                break;
+                case addi:
+				case andi:
+				case muli:
+				case ori:
+				case slli:
+				case slti:
+				case srai:
+				case srli:
+				case subi:
+				case xori:
+				case divi:
+				case load:
                 // Source register 1
                 rs1 = new Operand();
                 rs1.setOperandType(OperandType.Register);
@@ -245,64 +228,30 @@ public class OperandFetch {
                 }
                 rs2.setValue(cons_val);
 
-                forwardInstruction.setOperationType(operationType[opcodei]);
-                forwardInstruction.setSourceOperand1(rs1);
-                forwardInstruction.setSourceOperand2(rs2);
-                forwardInstruction.setDestinationOperand(rd);
-            }
-            OF_EX_Latch.setEX_enable(true);
-            EX_MA_Latch.setMA_enable(true);
-            MA_RW_Latch.setRW_enable(true);
+                instn.setOperationType(operationType[opcodei]);
+                instn.setSourceOperand1(rs1);
+                instn.setSourceOperand2(rs2);
+                instn.setDestinationOperand(rd);
+            break;
 
-            Instruction nop = new Instruction();
-            nop.setOperationType(OperationType.nop);
-            boolean notConflict = false;
-            //int tk=0;
-            //int freeze = 0;
-            while (true) {
-                if (EX_MA_Latch.getFlag() == 1) {
-                    OF_EX_Latch.setInstruction(nop);
-                    containingProcessor.getRegisterFile().setProgramCounter(containingProcessor.getRegisterFile().getProgramCounter() - 1);
-                    containingProcessor.setWrong_input(containingProcessor.getWrong_input() + 1);
-                    EX_MA_Latch.setFlag(0);
-                    Statistics.setNumberOfInstructions(Statistics.getNumberOfInstructions() - 1);
-                    break;
-                } else if (CheckConflict(forwardInstruction, OF_EX_Latch.instruction)
-                        && OF_EX_Latch.instruction.getOperationType() != OperationType.nop) {
-                    IF_EnableLatch.setIF_enable(false);
-                    OF_EX_Latch.setInstruction(nop);
-                    containingProcessor.setStalls(containingProcessor.getStalls() + 1);
-                    Statistics.setNumberOfInstructions(Statistics.getNumberOfInstructions() - 1);
-                    break;
-                } else if (CheckConflict(forwardInstruction, EX_MA_Latch.instruction)
-                        && EX_MA_Latch.instruction.getOperationType() != OperationType.nop) {
-                    IF_EnableLatch.setIF_enable(false);
-                    OF_EX_Latch.setInstruction(nop);
-                    containingProcessor.setStalls(containingProcessor.getStalls() + 1);
-                    Statistics.setNumberOfInstructions(Statistics.getNumberOfInstructions() - 1);
-                    break;
-                } else if (CheckConflict(forwardInstruction, MA_RW_Latch.instruction)
-                        && MA_RW_Latch.instruction.getOperationType() != OperationType.nop) {
-                    IF_EnableLatch.setIF_enable(false);
-                    OF_EX_Latch.setInstruction(nop);
-                    containingProcessor.setStalls(containingProcessor.getStalls() + 1);
-                    Statistics.setNumberOfInstructions(Statistics.getNumberOfInstructions() - 1);
-                    break;
-                } else if (forwardInstruction.getOperationType() == OperationType.end) {
-                    containingProcessor.getRegisterFile().setFreezed(true);
-                    containingProcessor.getRegisterFile().setFreezedprogramCounter(containingProcessor.getRegisterFile().getProgramCounter());
-                    containingProcessor.setFreezed_stalls(containingProcessor.getStalls());
-                    containingProcessor.setFreezed_wrong_input(containingProcessor.getWrong_input());
-                    Statistics.setFreezednumberOfInstructions(Statistics.getNumberOfInstructions());
-                }
-                notConflict = true;
-                break;
-
+            default:
+                instn.setOperationType(OperationType.nop);
+            break;
             }
-            if (notConflict && IF_OF_Latch.isOF_enable()) {
+
+                OF_EX_Latch.isNop = false;
+                OF_EX_Latch.setInstruction(instn);
+                OF_EX_Latch.insPC = IF_OF_Latch.insPC;
+                OF_EX_Latch.setEX_enable(true);
                 IF_EnableLatch.setIF_enable(true);
-                OF_EX_Latch.setInstruction(forwardInstruction);
+
+            if(operation.toString().equals("end")) {
+                IF_OF_Latch.setOF_enable(false);
+                IF_EnableLatch.setIF_enable(false);
             }
+            IF_OF_Latch.setOF_enable(false);
+            OF_EX_Latch.setEX_enable(true);
         }
     }
+
 }

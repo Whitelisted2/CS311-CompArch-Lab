@@ -25,38 +25,43 @@ public class RegisterWrite {
     public void performRW() {
         //System.out.println("YessRW");
         //System.out.println(OF_EX_Latch.isEX_busy());
-        if (OF_EX_Latch.isEX_busy()) {
-            return;
-        }
         if (MA_RW_Latch.isRW_enable()) {
-            Instruction cmd = MA_RW_Latch.getInstruction();
-            int alu_output = MA_RW_Latch.getALU_Output();
-            OperationType operationType = cmd.getOperationType();
-            switch (operationType) {
-                case store:
-                case jmp:
-                case beq:
-                case bne:
-                case blt:
-                case bgt:
-                case nop:
-                    break;
-                case load:
-                    int load_output = MA_RW_Latch.getLoad_Output();
-                    int DOP = cmd.getDestinationOperand().getValue();
-                    containingProcessor.getRegisterFile().setValue(DOP, load_output);
-                    break;
-                case end:
-                    containingProcessor.getRegisterFile().setProgramCounter(containingProcessor.getRegisterFile().getFreezedprogramCounter());
-                    Simulator.setSimulationComplete(true);
-                    break;
-                default:
-                    DOP = cmd.getDestinationOperand().getValue();
-                    containingProcessor.getRegisterFile().setValue(DOP, alu_output);
-                    break;
-            }
-            if (!EX_MA_Latch.isMA_enable()) {
+            // MA_RW_Latch.RW_enable = false;
+            if (!MA_RW_Latch.isNop) {
+                Instruction cmd = MA_RW_Latch.getInstruction();
+
+                int alu_output = MA_RW_Latch.getALU_Output();
+                OperationType operationType = cmd.getOperationType();
+                switch (operationType) {
+                    case store:
+                    case jmp:
+                    case beq:
+                    case bne:
+                    case blt:
+                    case bgt:
+                    case nop:
+                        break;
+                    case load:
+                        //System.out.println("RW "+cmd);
+                        //int load_output = MA_RW_Latch.getLoad_Output();
+                        int DOP = cmd.getDestinationOperand().getValue();
+                        //System.out.println("ADDRESS OF LOAD STORING "+DOP);
+                        //System.out.println("TO BE STORED "+alu_output);
+                        containingProcessor.getRegisterFile().setValue(DOP, alu_output);
+                        break;
+                    case end:
+                        //containingProcessor.getRegisterFile().setProgramCounter(containingProcessor.getRegisterFile().getFreezedprogramCounter());
+                        Simulator.setSimulationComplete(true);
+                        IF_EnableLatch.setIF_enable(false);
+                        break;
+                    default:
+                        //System.out.println("RW "+cmd);
+                        DOP = cmd.getDestinationOperand().getValue();
+                        containingProcessor.getRegisterFile().setValue(DOP, alu_output);
+                        break;
+                }
                 MA_RW_Latch.setRW_enable(false);
+                // IF_EnableLatch.setIF_enable(true);
             }
         }
     }

@@ -4,6 +4,8 @@ import generic.Instruction;
 
 public class MA_RW_LatchType {
 
+    public int insPC;
+    public boolean isNop;
     boolean RW_enable;
     Instruction instruction;
     int load_output;
@@ -13,9 +15,11 @@ public class MA_RW_LatchType {
     public MA_RW_LatchType() {
         Instruction nop = new Instruction();
         nop.setOperationType(Instruction.OperationType.nop);
-        RW_enable = true;
+        RW_enable = false;
         instruction = nop;
         RW_busy = false;
+        insPC = -1;
+        isNop = false;
     }
 
     public boolean isRW_busy() {

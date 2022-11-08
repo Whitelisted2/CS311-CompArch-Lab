@@ -4,16 +4,19 @@ import generic.Instruction;
 
 public class OF_EX_LatchType {
 
+    public int insPC;
     boolean EX_enable;
     Instruction instruction;
-    boolean EX_busy;
+    boolean EX_busy,isNop;
 
     public OF_EX_LatchType() {
         Instruction nop = new Instruction();
         nop.setOperationType(Instruction.OperationType.nop);
-        EX_enable = true;
+        EX_enable = false;
         instruction = nop;
         EX_busy = false;
+        isNop = false;
+        insPC = -1;
     }
 
     public boolean isEX_busy() {

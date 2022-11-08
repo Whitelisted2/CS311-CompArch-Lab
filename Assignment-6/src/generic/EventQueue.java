@@ -9,30 +9,41 @@ public class EventQueue {
 
     PriorityQueue<Event> queue;
 
-    public EventQueue() {
+    public EventQueue()
+    {
         queue = new PriorityQueue<Event>(new EventComparator());
     }
 
-    public void addEvent(Event event) {
+    public void addEvent(Event event)
+    {
         queue.add(event);
     }
 
-    public void processEvents() {
-        while (queue.isEmpty() == false && queue.peek().getEventTime() <= Clock.getCurrentTime()) {
+    public void processEvents()
+    {
+        while(!queue.isEmpty() && queue.peek().getEventTime() <= Clock.getCurrentTime())
+        {
             Event event = queue.poll();
             event.getProcessingElement().handleEvent(event);
         }
     }
 }
 
-class EventComparator implements Comparator<Event> {
+class EventComparator implements Comparator<Event>
+{
     @Override
-    public int compare(Event x, Event y) {
-        if (x.getEventTime() < y.getEventTime()) {
+    public int compare(Event x, Event y)
+    {
+        if(x.getEventTime() < y.getEventTime())
+        {
             return -1;
-        } else if (x.getEventTime() > y.getEventTime()) {
+        }
+        else if(x.getEventTime() > y.getEventTime())
+        {
             return 1;
-        } else {
+        }
+        else
+        {
             return 0;
         }
     }
