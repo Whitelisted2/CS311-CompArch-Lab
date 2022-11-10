@@ -13,9 +13,9 @@ public class InstructionFetch implements Element {
     EX_IF_LatchType EX_IF_Latch;
 
     public InstructionFetch(Processor containingProcessor,
-                            IF_EnableLatchType iF_EnableLatch,
-                            IF_OF_LatchType iF_OF_Latch,
-                            EX_IF_LatchType eX_IF_Latch) {
+            IF_EnableLatchType iF_EnableLatch,
+            IF_OF_LatchType iF_OF_Latch,
+            EX_IF_LatchType eX_IF_Latch) {
         this.containingProcessor = containingProcessor;
         this.IF_EnableLatch = iF_EnableLatch;
         this.IF_OF_Latch = iF_OF_Latch;
@@ -23,13 +23,16 @@ public class InstructionFetch implements Element {
     }
 
     public void performIF() {
-        //System.out.println("YessI");
+        // System.out.println("YessI");
         if (IF_EnableLatch.isIF_enable()) {
             if (IF_EnableLatch.isIF_busy()) {
                 IF_OF_Latch.setOF_enable(false);
                 return;
             }
-            Simulator.getEventQueue().addEvent(new MemoryReadEvent(Clock.getCurrentTime() + Configuration.mainMemoryLatency, this, containingProcessor.getMainMemory(), containingProcessor.getRegisterFile().getProgramCounter()));
+            Simulator.getEventQueue()
+                    .addEvent(new MemoryReadEvent(Clock.getCurrentTime() + Configuration.mainMemoryLatency, this,
+                            containingProcessor.getMainMemory(),
+                            containingProcessor.getRegisterFile().getProgramCounter()));
             IF_EnableLatch.setIF_busy(true);
             IF_OF_Latch.setOF_enable(false);
         }

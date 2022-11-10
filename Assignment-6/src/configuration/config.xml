@@ -26,7 +26,7 @@
 	</L1iCache>
 	
 	<L1dCache>
-		<NumberOfLines>1024</NumberOfLines>
+		<NumberOfLines>256</NumberOfLines>
 		<Latency>8</Latency>
 		<Associativity>4</Associativity>
 		<ReplacementPolicy>LRU</ReplacementPolicy>

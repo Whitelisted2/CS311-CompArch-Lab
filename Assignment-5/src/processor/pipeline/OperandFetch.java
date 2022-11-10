@@ -18,13 +18,12 @@ public class OperandFetch {
     EX_MA_LatchType EX_MA_Latch;
     MA_RW_LatchType MA_RW_Latch;
 
-
     public OperandFetch(Processor containingProcessor,
-                        IF_OF_LatchType iF_OF_Latch,
-                        OF_EX_LatchType oF_EX_Latch,
-                        EX_MA_LatchType eX_MA_Latch,
-                        MA_RW_LatchType mA_RW_Latch,
-                        IF_EnableLatchType if_enableLatch) {
+            IF_OF_LatchType iF_OF_Latch,
+            OF_EX_LatchType oF_EX_Latch,
+            EX_MA_LatchType eX_MA_Latch,
+            MA_RW_LatchType mA_RW_Latch,
+            IF_EnableLatchType if_enableLatch) {
         this.containingProcessor = containingProcessor;
         this.IF_OF_Latch = iF_OF_Latch;
         this.OF_EX_Latch = oF_EX_Latch;
@@ -70,8 +69,8 @@ public class OperandFetch {
                 && !inst.getOperationType().toString().equals("jmp")
                 && toCheck.getDestinationOperand() != null
                 && (toCheck.getDestinationOperand().getValue() == inst.getSourceOperand1().getValue() ||
-                toCheck.getDestinationOperand().getValue() == inst.getSourceOperand2().getValue())) {
-            ///System.out.println("!!!");
+                        toCheck.getDestinationOperand().getValue() == inst.getSourceOperand2().getValue())) {
+            /// System.out.println("!!!");
             return true;
         } else if (toCheck != null &&
                 !toCheck.getOperationType().toString().equals("nop")
@@ -81,12 +80,12 @@ public class OperandFetch {
                 && !inst.getOperationType().toString().equals("jmp")
                 && toCheck.getDestinationOperand() != null
                 && (toCheck.getDestinationOperand().getValue() == inst.getSourceOperand1().getValue() ||
-                toCheck.getDestinationOperand().getValue() == inst.getSourceOperand2().getValue()) &&
+                        toCheck.getDestinationOperand().getValue() == inst.getSourceOperand2().getValue())
+                &&
                 (inst.getOperationType().toString().equals("beq") ||
                         inst.getOperationType().toString().equals("bne") ||
                         inst.getOperationType().toString().equals("blt") ||
-                        inst.getOperationType().toString().equals("bgt"))
-        ) {
+                        inst.getOperationType().toString().equals("bgt"))) {
             return true;
         } else {
             return false;
@@ -95,8 +94,8 @@ public class OperandFetch {
     }
 
     public void performOF() {
-        //System.out.println("YessO");
-        //System.out.println(OF_EX_Latch.isEX_busy());
+        // System.out.println("YessO");
+        // System.out.println(OF_EX_Latch.isEX_busy());
         if (EX_MA_Latch.isMA_busy()) {
             return;
         }
@@ -257,12 +256,13 @@ public class OperandFetch {
             Instruction nop = new Instruction();
             nop.setOperationType(OperationType.nop);
             boolean notConflict = false;
-            //int tk=0;
+            // int tk=0;
             int freeze = 0;
             while (true) {
                 if (EX_MA_Latch.getFlag() == 1) {
                     OF_EX_Latch.setInstruction(nop);
-                    containingProcessor.getRegisterFile().setProgramCounter(containingProcessor.getRegisterFile().getProgramCounter() - 1);
+                    containingProcessor.getRegisterFile()
+                            .setProgramCounter(containingProcessor.getRegisterFile().getProgramCounter() - 1);
                     containingProcessor.setWrong_input(containingProcessor.getWrong_input() + 1);
                     EX_MA_Latch.setFlag(0);
                     Statistics.setNumberOfInstructions(Statistics.getNumberOfInstructions() - 1);
@@ -290,7 +290,8 @@ public class OperandFetch {
                     break;
                 } else if (forwardInstruction.getOperationType() == OperationType.end) {
                     containingProcessor.getRegisterFile().setFreezed(true);
-                    containingProcessor.getRegisterFile().setFreezedprogramCounter(containingProcessor.getRegisterFile().getProgramCounter());
+                    containingProcessor.getRegisterFile()
+                            .setFreezedprogramCounter(containingProcessor.getRegisterFile().getProgramCounter());
                     containingProcessor.setFreezed_stalls(containingProcessor.getStalls());
                     containingProcessor.setFreezed_wrong_input(containingProcessor.getWrong_input());
                     Statistics.setFreezednumberOfInstructions(Statistics.getNumberOfInstructions());

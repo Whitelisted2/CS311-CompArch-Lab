@@ -29,6 +29,7 @@ public class Execute {
 	}
 
 	public void performEX() {
+		boolean isBranch = false;
 		if (OF_EX_Latch.getIsNOP()) {
 			EX_MA_Latch.setIsNop(true);
 			OF_EX_Latch.setIsNOP(false);
@@ -167,12 +168,15 @@ public class Execute {
 				switch (op_type) {
 				case beq:
 					if (op1 == op2) {
+						isBranch=true;
 						alu_result = imm + currentPC;
 						EX_IF_Latch.setIF_Enable(true, alu_result);
 					}
 					break;
 				case bne:
 					if (op1 != op2) {
+						isBranch=true;
+
 						alu_result = imm + currentPC;
 						EX_IF_Latch.setIF_Enable(true, alu_result);
 					}
@@ -180,12 +184,16 @@ public class Execute {
 					break;
 				case blt:
 					if (op1 < op2) {
+						isBranch=true;
+
 						alu_result = imm + currentPC;
 						EX_IF_Latch.setIF_Enable(true, alu_result);
 					}
 					break;
 				case bgt:
 					if (op1 > op2) {
+						isBranch=true;
+
 						alu_result = imm + currentPC;
 						EX_IF_Latch.setIF_Enable(true, alu_result);
 					}
@@ -195,9 +203,11 @@ public class Execute {
 				}
 			}
 			EX_MA_Latch.setALU_result(alu_result);
-
+			if(isBranch==true){
+				// OF_EX_Latch.setIsNOP(true); //
+				IF_OF_Latch.setIsNOP(true);
+			}
 			EX_MA_Latch.setMA_enable(true);
 		}
 	}
-
 }

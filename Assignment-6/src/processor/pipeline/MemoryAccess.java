@@ -93,7 +93,5 @@ public class MemoryAccess implements Element{
         else {
             EX_MA_Latch.setMA_busy(false);
         }
-
     }
-
 }
