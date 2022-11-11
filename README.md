@@ -9,6 +9,7 @@ This repository contains files related to Computer Architecture Lab (Autumn 2022
 3. Single Cycle Processor Simulation
 4. Pipelined Core Model Simulation
 5. Discrete Event Simulator
+6. Implementing Instruction and Data Caches
 
 
 > Plan for what it is difficult while it is easy, do what is great while it is small. &mdash; Sun Tzu, The Art of War
